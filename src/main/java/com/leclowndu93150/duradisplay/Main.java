@@ -11,12 +11,9 @@ import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.Mod;
-import net.neoforged.fml.earlydisplay.ElementShader;
 import net.neoforged.neoforge.client.IItemDecorator;
-import net.neoforged.neoforge.client.ItemDecoratorHandler;
 import net.neoforged.neoforge.client.event.RegisterItemDecorationsEvent;
 
-import java.text.DecimalFormat;
 
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod(Main.MODID)
@@ -63,20 +60,9 @@ public class Main
                 poseStack.popPose();
 
             }
-
             return true;
         }
 
-    }
-
-    public static String format(float number) {
-        DecimalFormat decimalFormat = new DecimalFormat("0.#");
-
-        if (number >= 1000000000) return decimalFormat.format(number / 1000000000) + "b";
-        if (number >= 1000000) return decimalFormat.format(number / 1000000) + "m";
-        if (number >= 1000) return decimalFormat.format(number / 1000) + "k";
-
-        return Float.toString(number).replaceAll("\\.?0*$", "");
     }
 
 }
