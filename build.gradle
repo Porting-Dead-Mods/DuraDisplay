@@ -18,6 +18,8 @@ base {
 }
 
 // Mojang ships Java 17 to end users in 1.18+, so your mod should target Java 17.
+// WARN: When changing this you might also have to change the value in
+// duradisplay.mixins.json
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 //minecraft.accessTransformers.file rootProject.file('src/main/resources/META-INF/accesstransformer.cfg')
@@ -128,6 +130,14 @@ tasks.withType(ProcessResources).configureEach {
         expand replaceProperties
     }
 }
+
+// Required for mixins
+repositories {
+    maven {
+        url = 'https://repo.spongepowered.org/repository/maven-public/'
+    }
+}
+
 
 // Example configuration to allow publishing using the maven-publish plugin
 publishing {
