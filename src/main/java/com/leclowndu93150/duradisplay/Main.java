@@ -1,28 +1,13 @@
 package com.leclowndu93150.duradisplay;
 
 import com.leclowndu93150.duradisplay.api.CustomDisplayItem;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.Tesselator;
-import net.minecraft.SharedConstants;
-import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.client.IItemDecorator;
 import net.neoforged.neoforge.client.event.RegisterItemDecorationsEvent;
-import net.neoforged.neoforge.energy.IEnergyStorage;
-import net.neoforged.neoforge.registries.DeferredRegister;
-
-import javax.annotation.Nullable;
 
 
 // The value here should match an entry in the META-INF/mods.toml file
@@ -76,68 +61,6 @@ public class Main
                         event.register(item, new DuraDisplay(null, DuraDisplay.DisplayType.ENERGY));
                     }
             }
-        }
-    }
-
-    private record DuraDisplay(@Nullable CustomDisplayItem customDisplayItem, DisplayType type) implements IItemDecorator {
-        public boolean render(GuiGraphics guiGraphics, Font font, ItemStack stack, int xPosition, int yPosition) {
-            if (!stack.isEmpty() && stack.isBarVisible()) {
-                switch (type) {
-                    case DURABILITY:
-                        if (stack.isDamaged()) {
-                            int damage = stack.getDamageValue();
-                            int maxDamage = stack.getMaxDamage();
-                            double durabilityPercentage = ((double) (maxDamage - damage) / (double) maxDamage) * 100D;
-                            renderText(guiGraphics, font, String.format("%.0f%%", durabilityPercentage), xPosition, yPosition, stack.getItem().getBarColor(stack)); // Default color white
-                        }
-                        break;
-                    case ENERGY:
-                        IEnergyStorage energyStorage = stack.getCapability(Capabilities.EnergyStorage.ITEM);
-                        if (energyStorage != null) {
-                            int energyStored = energyStorage.getEnergyStored();
-                            int maxEnergyStorage = energyStorage.getMaxEnergyStored();
-                            double energyPercentage = ((double) energyStored / (double) maxEnergyStorage) * 100D;
-                            renderText(guiGraphics, font, String.format("%.0f%%", energyPercentage), xPosition, yPosition, 0x34D8EB); // Custom color for energy display
-                        } else if (stack.isBarVisible()) {
-                            int l = stack.getBarWidth();
-                            int i = stack.getBarColor();
-                            int j = xPosition + 2;
-                            int k = yPosition + 13;
-                            guiGraphics.fill(RenderType.guiOverlay(), j, k, j + 13, k + 2, -16777216);
-                            guiGraphics.fill(RenderType.guiOverlay(), j, k, j + l, k + 1, i | 0xFF000000);
-                        }
-                        break;
-                    case CUSTOM:
-                        if (customDisplayItem != null && customDisplayItem.shouldDisplay(stack)) {
-                            double energyPercentage = customDisplayItem.getPercentage(stack);
-                            int color = customDisplayItem.getColor(stack); // Get color dynamically
-                            renderText(guiGraphics, font, String.format("%.0f%%", energyPercentage), xPosition, yPosition, color); // Use custom color
-                        }
-                        break;
-                }
-                return true;
-            }
-            return false;
-        }
-
-        private void renderText(GuiGraphics guiGraphics, Font font, String text, int xPosition, int yPosition, int color) {
-            PoseStack poseStack = guiGraphics.pose();
-            int stringWidth = font.width(text);
-            int x = ((xPosition + 8) * 2 + 1 + stringWidth / 2 - stringWidth);
-            int y = (yPosition * 2) + 22;
-            poseStack.pushPose();
-            poseStack.scale(0.5F, 0.5F, 0.5F);
-            poseStack.translate(0.0D, 0.0D, 500.0F);
-            MultiBufferSource.BufferSource multibuffersource$buffersource = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
-            font.drawInBatch(text, x, y, color, true, poseStack.last().pose(), multibuffersource$buffersource, Font.DisplayMode.NORMAL, 0, 15728880, false);
-            multibuffersource$buffersource.endBatch();
-            poseStack.popPose();
-        }
-
-        private enum DisplayType {
-            DURABILITY,
-            ENERGY,
-            CUSTOM,
         }
     }
 }
