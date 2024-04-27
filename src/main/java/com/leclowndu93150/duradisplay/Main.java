@@ -47,7 +47,7 @@ public class Main
 
                 int stringWidth = font.width(formattedPercentage);
                 int x = ((xPosition + 8) * 2 + 1 + stringWidth / 2 - stringWidth);
-                int y = (yPosition * 2) + 18;
+                int y = (yPosition * 2) + 22;
 
                 int color = stack.getItem().getBarColor(stack);
 
