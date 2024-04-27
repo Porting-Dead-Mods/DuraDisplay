@@ -127,7 +127,7 @@ public class Main
             int y = (yPosition * 2) + 22;
             poseStack.pushPose();
             poseStack.scale(0.5F, 0.5F, 0.5F);
-            poseStack.translate(0.0D, 0.0D, 750.0F);
+            poseStack.translate(0.0D, 0.0D, 500.0F);
             MultiBufferSource.BufferSource multibuffersource$buffersource = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
             font.drawInBatch(text, x, y, color, true, poseStack.last().pose(), multibuffersource$buffersource, Font.DisplayMode.NORMAL, 0, 15728880, false);
             multibuffersource$buffersource.endBatch();
