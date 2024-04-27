@@ -37,7 +37,7 @@ public class TestItem extends Item implements CustomDisplayItem {
     public InteractionResultHolder<ItemStack> use(Level pLevel, Player pPlayer, InteractionHand pUsedHand) {
         ItemStack itemInHand = pPlayer.getItemInHand(pUsedHand);
         itemInHand.getOrCreateTag().putInt("maxTest", 100);
-        itemInHand.getOrCreateTag().putInt("test", itemInHand.getOrCreateTag().getInt("test")+1);
+        itemInHand.getOrCreateTag().putInt("test", itemInHand.getOrCreateTag().getInt("test") + 1);
         return InteractionResultHolder.success(itemInHand);
     }
 }
