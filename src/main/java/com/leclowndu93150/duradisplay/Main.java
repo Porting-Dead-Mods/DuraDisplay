@@ -7,6 +7,7 @@ import net.minecraft.SharedConstants;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -93,7 +94,16 @@ public class Main
                             int maxEnergyStorage = energyStorage.getMaxEnergyStored();
                             double energyPercentage = ((double) energyStored / (double) maxEnergyStorage) * 100D;
                             renderText(guiGraphics, font, String.format("%.0f%%", energyPercentage), xPosition, yPosition, 0x34D8EB); // Custom color for energy display
+                        } else if (stack.isBarVisible()) {
+                            {
+                                    int l = stack.getBarWidth();
+                                    int i = stack.getBarColor();
+                                    int j = xPosition + 2;
+                                    int k = yPosition + 13;
+                                    guiGraphics.fill(RenderType.guiOverlay(), j, k, j + 13, k + 2, -16777216);
+                                    guiGraphics.fill(RenderType.guiOverlay(), j, k, j + l, k + 1, i | 0xFF000000);
                         }
+                }
                         break;
                     case CUSTOM:
                         if (customDisplayItem != null && customDisplayItem.shouldDisplay(stack)) {
