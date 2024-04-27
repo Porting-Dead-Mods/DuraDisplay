@@ -18,6 +18,10 @@ authors="${mod_authors}"
 
 description='''${mod_description}'''
 
+[[mixins]]
+
+config = "${mod_id}.mixins.json"
+
 [[dependencies.${mod_id}]]
 
 modId="neoforge"
@@ -41,7 +45,3 @@ versionRange="${minecraft_version_range}"
 ordering="NONE"
 
 side="BOTH"
-
-[[mixin]]
-
-config = "${mod_id}.mixins.json"

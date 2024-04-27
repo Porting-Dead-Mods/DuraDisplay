@@ -66,7 +66,7 @@ public class Main
                     }
                     else
                     {
-                        // Item has energy, so we pass null and therefore use
+                        // Item has energy or is a regular item, so we pass null and therefore use
                         // builtin behavior
                         event.register(item, new DuraDisplay(null, DuraDisplay.DisplayType.ENERGY));
                     }
@@ -76,8 +76,7 @@ public class Main
 
     private record DuraDisplay(@Nullable CustomDisplayItem customDisplayItem, DisplayType type) implements IItemDecorator {
         public boolean render(GuiGraphics guiGraphics, Font font, ItemStack stack, int xPosition, int yPosition) {
-            if (!stack.isEmpty()) {
-                PoseStack poseStack = guiGraphics.pose();
+            if (!stack.isEmpty() && stack.isBarVisible()) {
                 switch (type) {
                     case DURABILITY:
                         if (stack.isDamaged()) {
@@ -95,15 +94,13 @@ public class Main
                             double energyPercentage = ((double) energyStored / (double) maxEnergyStorage) * 100D;
                             renderText(guiGraphics, font, String.format("%.0f%%", energyPercentage), xPosition, yPosition, 0x34D8EB); // Custom color for energy display
                         } else if (stack.isBarVisible()) {
-                            {
-                                    int l = stack.getBarWidth();
-                                    int i = stack.getBarColor();
-                                    int j = xPosition + 2;
-                                    int k = yPosition + 13;
-                                    guiGraphics.fill(RenderType.guiOverlay(), j, k, j + 13, k + 2, -16777216);
-                                    guiGraphics.fill(RenderType.guiOverlay(), j, k, j + l, k + 1, i | 0xFF000000);
+                            int l = stack.getBarWidth();
+                            int i = stack.getBarColor();
+                            int j = xPosition + 2;
+                            int k = yPosition + 13;
+                            guiGraphics.fill(RenderType.guiOverlay(), j, k, j + 13, k + 2, -16777216);
+                            guiGraphics.fill(RenderType.guiOverlay(), j, k, j + l, k + 1, i | 0xFF000000);
                         }
-                }
                         break;
                     case CUSTOM:
                         if (customDisplayItem != null && customDisplayItem.shouldDisplay(stack)) {
