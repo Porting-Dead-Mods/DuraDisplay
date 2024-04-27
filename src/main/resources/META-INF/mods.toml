@@ -5,6 +5,7 @@ loaderVersion="${loader_version_range}"
 license="${mod_license}"
 
 logoFile="logo.png"
+
 [[mods]]
 
 modId="${mod_id}"
@@ -32,10 +33,14 @@ ordering="NONE"
 side="BOTH"
 
 [[dependencies.${mod_id}]]
+
 modId="minecraft"
+
 type="required"
 
 versionRange="${minecraft_version_range}"
+
 ordering="NONE"
+
 side="BOTH"
 

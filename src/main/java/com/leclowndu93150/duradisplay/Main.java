@@ -22,9 +22,8 @@ import net.neoforged.neoforge.client.ItemDecoratorHandler;
 import net.neoforged.neoforge.client.event.RegisterItemDecorationsEvent;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.registries.DeferredRegister;
-
 import javax.annotation.Nullable;
-import java.text.DecimalFormat;
+
 
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod(Main.MODID)
@@ -88,7 +87,7 @@ public class Main
                     int energyStored = energyStorage.getEnergyStored();
                     int maxEnergyStorage = energyStorage.getMaxEnergyStored();
 
-                    double energyPercentage = ((double) (maxEnergyStorage - energyStored) / (double) maxEnergyStorage) * 100D;
+                    double energyPercentage = ((double) energyStored / (double) maxEnergyStorage) * 100D;
 
                     String formattedPercentage = String.format("%.0f%%", energyPercentage);
 
@@ -167,17 +166,6 @@ public class Main
             CUSTOM,
         }
 
-    }
-
-    public static String format(float number)
-    {
-        DecimalFormat decimalFormat = new DecimalFormat("0.#");
-
-        if (number >= 1_000_000_000) return decimalFormat.format(number / 1_000_000_000) + "b";
-        if (number >= 1_000_000) return decimalFormat.format(number / 1_000_000) + "m";
-        if (number >= 1_000) return decimalFormat.format(number / 1_000) + "k";
-
-        return Float.toString(number).replaceAll("\\.?0*$", "");
     }
 
 }
