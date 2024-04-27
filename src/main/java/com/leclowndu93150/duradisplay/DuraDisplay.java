@@ -16,7 +16,7 @@ import javax.annotation.Nullable;
 
 public record DuraDisplay(@Nullable CustomDisplayItem customDisplayItem, DisplayType type) implements IItemDecorator {
     public boolean render(GuiGraphics guiGraphics, Font font, ItemStack stack, int xPosition, int yPosition) {
-        if (!stack.isEmpty() && stack.isBarVisible()) {
+        if (!stack.isEmpty() && (stack.isBarVisible() || (customDisplayItem != null && customDisplayItem.shouldDisplay(stack)))) {
             switch (type) {
                 case DURABILITY -> {
                     if (stack.isDamaged()) {
@@ -46,9 +46,9 @@ public record DuraDisplay(@Nullable CustomDisplayItem customDisplayItem, Display
                 }
                 case CUSTOM -> {
                     if (customDisplayItem != null && customDisplayItem.shouldDisplay(stack)) {
-                        double energyPercentage = customDisplayItem.getPercentage(stack);
+                        double percentage = customDisplayItem.getPercentage(stack);
                         int color = customDisplayItem.getColor(stack); // Get color dynamically
-                        renderText(guiGraphics, font, String.format("%.0f%%", energyPercentage), xPosition, yPosition, color); // Use custom color
+                        renderText(guiGraphics, font, String.format("%.0f%%", percentage), xPosition, yPosition, color); // Use custom color
                     }
                 }
             }

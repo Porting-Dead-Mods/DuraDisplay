@@ -8,24 +8,23 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.NotNull;
 
 public class TestItem extends Item implements CustomDisplayItem {
     public TestItem() {
-        super(new Properties());
+        super(new Properties().component(Main.TEST_DATA, 0));
     }
 
     @Override
     public boolean shouldDisplay(ItemStack stack) {
-        if (stack.hasTag()){
-            return stack.getTag().getInt("test") > 0;
-        }
-        return false;
+        return true;
     }
 
     @Override
     public int getPercentage(ItemStack stack) {
-        int maxTest = stack.getOrCreateTag().getInt("maxTest");
-        float test = (float) (maxTest - stack.getOrCreateTag().getInt("test")) / maxTest;
+        int maxTest = 100;
+        float test = (float) (maxTest - stack.getOrDefault(Main.TEST_DATA, 0)) / maxTest;
+        System.out.println("Percentage: "+test * 100);
         return (int) (test * 100);
     }
 
@@ -35,10 +34,9 @@ public class TestItem extends Item implements CustomDisplayItem {
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level pLevel, Player pPlayer, InteractionHand pUsedHand) {
+    public @NotNull InteractionResultHolder<ItemStack> use(Level pLevel, Player pPlayer, InteractionHand pUsedHand) {
         ItemStack itemInHand = pPlayer.getItemInHand(pUsedHand);
-        itemInHand.getOrCreateTag().putInt("maxTest", 100);
-        itemInHand.getOrCreateTag().putInt("test", itemInHand.getOrCreateTag().getInt("test")+1);
+        itemInHand.set(Main.TEST_DATA, itemInHand.getOrDefault(Main.TEST_DATA, 0) + 1);
         return InteractionResultHolder.success(itemInHand);
     }
 }
