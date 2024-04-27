@@ -1,13 +1,13 @@
 package com.leclowndu93150.duradisplay.api;
 
-import com.leclowndu93150.duradisplay.TestItem;
+//import com.leclowndu93150.duradisplay.TestItem;
 import net.minecraft.world.item.ItemStack;
 
 /**
  * This is the CustomDisplayItem interface. It allows
  * your item to have a custom percentage display like
  * there is for energy and durability.
- * For an example look at {@link TestItem}
+ * For an example look at {//@link TestItem}
  */
 public interface CustomDisplayItem
 {

@@ -11,18 +11,17 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.TieredItem;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
-import net.neoforged.fml.earlydisplay.ElementShader;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.client.IItemDecorator;
-import net.neoforged.neoforge.client.ItemDecoratorHandler;
 import net.neoforged.neoforge.client.event.RegisterItemDecorationsEvent;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.registries.DeferredRegister;
+
 import javax.annotation.Nullable;
 
 
@@ -33,18 +32,24 @@ public class Main
     // Define mod id in a common place for everything to reference
     public static final String MODID = "duradisplay";
 
+    /*
     public Main(IEventBus modEventbus)
     {
         // Only register items if running in-dev
+
         if (SharedConstants.IS_RUNNING_IN_IDE)
+
         {
             DeferredRegister<Item> ITEMS = DeferredRegister.create(BuiltInRegistries.ITEM, MODID);
-            ITEMS.register("test_item", TestItem::new);
+            //ITEMS.register("test_item", TestItem::new);
             ITEMS.register(modEventbus);
         }
-    }
 
-    @Mod.EventBusSubscriber(modid = MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+
+    }
+    */
+
+    @EventBusSubscriber(modid = MODID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
     public static class ClientEvents
     {
         @SubscribeEvent
@@ -58,7 +63,7 @@ public class Main
                         // customDisplayItem to the duradisplay
                         event.register(item, new DuraDisplay(customDisplayItem, DuraDisplay.DisplayType.CUSTOM));
                     }
-                    else if (item.canBeDepleted())
+                    else if (item.getDefaultInstance().isDamageableItem())
                     {
                         // Item has durability, so we pass null and therefore use
                         // builtin behavior

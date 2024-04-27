@@ -1,6 +1,7 @@
 package com.leclowndu93150.duradisplay;
 
 import com.leclowndu93150.duradisplay.api.CustomDisplayItem;
+import net.minecraft.core.component.DataComponentType;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
@@ -15,7 +16,7 @@ public class TestItem extends Item implements CustomDisplayItem {
 
     @Override
     public boolean shouldDisplay(ItemStack stack) {
-        if (stack.hasTag()) {
+        if (stack.hasTag()){
             return stack.getTag().getInt("test") > 0;
         }
         return false;
