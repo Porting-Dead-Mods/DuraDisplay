@@ -22,6 +22,10 @@ license="${mod_license}"
 # The modid of the mod
 modId="${mod_id}" #mandatory
 
+# Location of the mixin config file
+[[mixins]]
+config = "${mod_id}.mixins.json"
+
 # The version number of the mod
 version="${mod_version}" #mandatory
 

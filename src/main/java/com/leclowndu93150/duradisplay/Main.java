@@ -48,8 +48,7 @@ public class Main
 
                 String formattedPercentage = String.format("%.0f%%", durabilityPercentage);
 
-                String string = formattedPercentage;
-                int stringWidth = font.width(string);
+                int stringWidth = font.width(formattedPercentage);
                 int x = ((xPosition + 8) * 2 + 1 + stringWidth / 2 - stringWidth);
                 int y = (yPosition * 2) + 18;
 
@@ -59,7 +58,7 @@ public class Main
                 poseStack.scale(0.5F, 0.5F, 0.5F);
                 poseStack.translate(0.0D, 0.0D, 750.0F);
                 MultiBufferSource.BufferSource multibuffersource$buffersource = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
-                font.drawInBatch(string, x, y, color, true, poseStack.last().pose(), multibuffersource$buffersource, Font.DisplayMode.NORMAL, 0, 15728880, false);
+                font.drawInBatch(formattedPercentage, x, y, color, true, poseStack.last().pose(), multibuffersource$buffersource, Font.DisplayMode.NORMAL, 0, 15728880, false);
                 multibuffersource$buffersource.endBatch();
                 poseStack.popPose();
 
