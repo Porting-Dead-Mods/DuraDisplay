@@ -17,6 +17,12 @@ import javax.annotation.Nullable;
 public record DuraDisplay(@Nullable CustomDisplayItem customDisplayItem, DisplayType type) implements IItemDecorator {
     public boolean render(GuiGraphics guiGraphics, Font font, ItemStack stack, int xPosition, int yPosition) {
         if (!stack.isEmpty() && (stack.isBarVisible() || (customDisplayItem != null && customDisplayItem.shouldDisplay(stack)))) {
+            IEnergyStorage energyStorage = stack.getCapability(Capabilities.EnergyStorage.ITEM);
+            DisplayType type = type();
+            // Give energystorage a higer prio than durability
+            if (energyStorage != null) {
+                type = DisplayType.ENERGY;
+            }
             switch (type) {
                 case DURABILITY -> {
                     if (stack.isDamaged()) {
@@ -27,8 +33,8 @@ public record DuraDisplay(@Nullable CustomDisplayItem customDisplayItem, Display
                     }
                 }
                 case ENERGY -> {
-                    IEnergyStorage energyStorage = stack.getCapability(Capabilities.EnergyStorage.ITEM);
                     if (energyStorage != null) {
+                        System.out.println("Found energy item: "+stack.getItem());
                         int energyStored = energyStorage.getEnergyStored();
                         int maxEnergyStorage = energyStorage.getMaxEnergyStored();
                         double energyPercentage = ((double) energyStored / (double) maxEnergyStorage) * 100D;
