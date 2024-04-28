@@ -45,3 +45,9 @@ mandatory=true
 versionRange="${minecraft_version_range}"
 ordering="NONE"
 side="BOTH"
+
+[[dependencies.${mod_id}]]
+modId="gtceu"
+mandatory=false
+ordering="NONE"
+side="BOTH"
