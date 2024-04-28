@@ -11,18 +11,18 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.TieredItem;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.Mod;
-import net.neoforged.fml.earlydisplay.ElementShader;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.client.IItemDecorator;
-import net.neoforged.neoforge.client.ItemDecoratorHandler;
-import net.neoforged.neoforge.client.event.RegisterItemDecorationsEvent;
-import net.neoforged.neoforge.energy.IEnergyStorage;
-import net.neoforged.neoforge.registries.DeferredRegister;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.IItemDecorator;
+import net.minecraftforge.client.event.RegisterItemDecorationsEvent;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.energy.IEnergyStorage;
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.ForgeRegistries;
 import javax.annotation.Nullable;
 
 
@@ -33,14 +33,15 @@ public class Main
     // Define mod id in a common place for everything to reference
     public static final String MODID = "duradisplay";
 
-    public Main(IEventBus modEventbus)
+    public Main()
     {
+        IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         // Only register items if running in-dev
         if (SharedConstants.IS_RUNNING_IN_IDE)
         {
-            DeferredRegister<Item> ITEMS = DeferredRegister.create(BuiltInRegistries.ITEM, MODID);
+            DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, MODID);
             ITEMS.register("test_item", TestItem::new);
-            ITEMS.register(modEventbus);
+            ITEMS.register(modEventBus);
         }
     }
 
@@ -77,10 +78,10 @@ public class Main
     private record DuraDisplay(@Nullable CustomDisplayItem customDisplayItem, DisplayType type) implements IItemDecorator {
         public boolean render(GuiGraphics guiGraphics, Font font, ItemStack stack, int xPosition, int yPosition) {
             if (!stack.isEmpty() && stack.isBarVisible()) {
-                IEnergyStorage energyStorage = stack.getCapability(Capabilities.EnergyStorage.ITEM);
+                LazyOptional<IEnergyStorage> energyStorage = stack.getCapability(ForgeCapabilities.ENERGY);
                 DisplayType type = type();
                 // Give energystorage a higer prio than durability
-                if (energyStorage != null) {
+                if (energyStorage.isPresent()) {
                     type = DisplayType.ENERGY;
                 }
                 switch (type) {
@@ -93,12 +94,14 @@ public class Main
                         }
                         break;
                     case ENERGY:
-                        if (energyStorage != null) {
-                            System.out.println("Found energy item: "+stack.getItem());
-                            int energyStored = energyStorage.getEnergyStored();
-                            int maxEnergyStorage = energyStorage.getMaxEnergyStored();
-                            double energyPercentage = ((double) energyStored / (double) maxEnergyStorage) * 100D;
-                            renderText(guiGraphics, font, String.format("%.0f%%", energyPercentage), xPosition, yPosition, 0x34D8EB); // Custom color for energy display
+                        if (energyStorage.isPresent()) {
+                            energyStorage.ifPresent(es -> {
+                                System.out.println("Found energy item: " + stack.getItem());
+                                int energyStored = es.getEnergyStored();
+                                int maxEnergyStorage = es.getMaxEnergyStored();
+                                double energyPercentage = ((double) energyStored / (double) maxEnergyStorage) * 100D;
+                                renderText(guiGraphics, font, String.format("%.0f%%", energyPercentage), xPosition, yPosition, 0x34D8EB); // Custom color for energy display
+                            });
                         } else {
                             int l = stack.getBarWidth();
                             int i = stack.getBarColor();
