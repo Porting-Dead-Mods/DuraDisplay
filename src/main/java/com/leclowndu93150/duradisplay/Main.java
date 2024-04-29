@@ -50,7 +50,7 @@ public class Main
     public static class ClientEvents
     {
         @SubscribeEvent
-        private static void onRegisterItemDecorations(final RegisterItemDecorationsEvent event)
+        public static void onRegisterItemDecorations(final RegisterItemDecorationsEvent event)
         {
             for (Item item : ForgeRegistries.ITEMS)
             {
