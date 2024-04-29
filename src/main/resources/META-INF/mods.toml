@@ -49,5 +49,6 @@ side="BOTH"
 [[dependencies.${mod_id}]]
 modId="gtceu"
 mandatory=false
+versionRange="[1.2.0a,)"
 ordering="NONE"
 side="BOTH"
