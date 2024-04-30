@@ -1,7 +1,5 @@
 package com.leclowndu93150.duradisplay;
 
-import com.gregtechceu.gtceu.api.capability.IEnergyContainer;
-import com.gregtechceu.gtceu.api.capability.IPlatformEnergyStorage;
 import com.leclowndu93150.duradisplay.api.CustomDisplayItem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
@@ -26,7 +24,6 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import javax.annotation.Nullable;
-import com.gregtechceu.gtceu.api.capability.GTCapabilityHelper;
 
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod(Main.MODID)
@@ -81,16 +78,11 @@ public class Main
         public boolean render(GuiGraphics guiGraphics, Font font, ItemStack stack, int xPosition, int yPosition) {
             if (!stack.isEmpty() && stack.isBarVisible()) {
                 LazyOptional<IEnergyStorage> energyStorage = stack.getCapability(ForgeCapabilities.ENERGY);
-                IPlatformEnergyStorage euStorage = GTCapabilityHelper.getPlatformEnergyItem(stack);
                 DisplayType type = type();
                 // Give energystorage a higer prio than durability
                 if (energyStorage.isPresent()) {
                     type = DisplayType.ENERGY;
                 }
-                if(euStorage!= null){
-                    type = DisplayType.GREGTECH;
-                }
-
                 switch (type) {
                     case DURABILITY:
                         if (stack.isDamaged()) {
@@ -118,14 +110,6 @@ public class Main
                             guiGraphics.fill(RenderType.guiOverlay(), j, k, j + l, k + 1, i | 0xFF000000);
                         }
                         break;
-
-                    case GREGTECH:
-                                long energyStored = euStorage.getAmount();
-                                long maxEnergyStorage = euStorage.getCapacity();
-                                double energyPercentage = ((double) energyStored / (double) maxEnergyStorage) * 100D;
-                                renderText(guiGraphics, font, String.format("%.0f%%", energyPercentage), xPosition, yPosition, 0x34D8EB); // Custom color for energy display
-                        break;
-
                     case CUSTOM:
                         if (customDisplayItem != null && customDisplayItem.shouldDisplay(stack)) {
                             double energyPercentage = customDisplayItem.getPercentage(stack);
@@ -156,7 +140,6 @@ public class Main
             DURABILITY,
             ENERGY,
             CUSTOM,
-            GREGTECH,
         }
     }
 }
