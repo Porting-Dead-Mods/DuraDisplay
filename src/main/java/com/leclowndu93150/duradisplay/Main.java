@@ -87,8 +87,7 @@ public class Main
                 if (energyStorage.isPresent()) {
                     type = DisplayType.ENERGY;
                 }
-
-                if(euStorage != null){
+                if(euStorage!= null){
                     type = DisplayType.GREGTECH;
                 }
 
@@ -119,12 +118,14 @@ public class Main
                             guiGraphics.fill(RenderType.guiOverlay(), j, k, j + l, k + 1, i | 0xFF000000);
                         }
                         break;
+
                     case GREGTECH:
                                 long energyStored = euStorage.getAmount();
                                 long maxEnergyStorage = euStorage.getCapacity();
                                 double energyPercentage = ((double) energyStored / (double) maxEnergyStorage) * 100D;
                                 renderText(guiGraphics, font, String.format("%.0f%%", energyPercentage), xPosition, yPosition, 0x34D8EB); // Custom color for energy display
                         break;
+
                     case CUSTOM:
                         if (customDisplayItem != null && customDisplayItem.shouldDisplay(stack)) {
                             double energyPercentage = customDisplayItem.getPercentage(stack);
