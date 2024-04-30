@@ -45,7 +45,6 @@ public class Main
                         case ENERGY:
                             if (energyStorage.isPresent()) {
                                 energyStorage.ifPresent(es -> {
-                                    System.out.println("Found energy item: " + stack.getItem());
                                     int energyStored = es.getEnergyStored();
                                     int maxEnergyStorage = es.getMaxEnergyStored();
                                     double energyPercentage = ((double) energyStored / (double) maxEnergyStorage) * 100D;
