@@ -2,7 +2,7 @@ plugins {
     id 'eclipse'
     id 'idea'
     id 'maven-publish'
-    id 'net.neoforged.gradle' version '[6.0.18,6.2)'
+    id 'net.minecraftforge.gradle' version '5.1.+'
     id 'org.spongepowered.mixin' version '0.7.+'
 }
 
@@ -18,8 +18,6 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
 minecraft {
     mappings channel: mapping_channel, version: mapping_version
-
-    copyIdeResources = true
 
     runs {
         configureEach {
@@ -58,16 +56,39 @@ minecraft {
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 repositories {
+    maven { url = "https://maven.firstdarkdev.xyz/snapshots" } // LDLib
+    /*
+    // Registrate
+    maven {
+        url = "https://maven.tterrag.com/"
+        content {
+            includeGroup("com.tterrag.registrate")
+        }
+    }
+    maven { url = "https://maven.terraformersmc.com/releases/" } // EMI
+    maven { url = "https://maven.shedaniel.me/" } // REI, Architectury
+    maven { url = "https://modmaven.dev/" } // JEI
+    maven { url = "https://maven.saps.dev/minecraft/" } // KubeJS
+    */
+    mavenLocal()
+    mavenCentral()
 }
 
 dependencies {
-    minecraft "net.neoforged:forge:${minecraft_version}-${neo_version}"
+    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
 
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
     compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:0.3.5"))
     implementation(jarJar("io.github.llamalad7:mixinextras-forge:0.3.5")) {
         jarJar.ranged(it, "[0.3.5,)")
     }
+
+    implementation fg.deobf("com.gregtechceu.gtceu:gtceu-1.20.1:1.2.0.a:slim")
+    implementation fg.deobf("com.lowdragmc.ldlib:ldlib-forge-1.20.1:1.0.25.d")
+    /*
+    implementation fg.deobf("com.tterrag.registrate:Registrate:MC1.20-1.3.3")
+    runtimeOnly fg.deobf("dev.toma.configuration:configuration-forge-1.20.1:2.2.0")
+     */
 }
 
 mixin {
@@ -80,7 +101,7 @@ tasks.withType(ProcessResources).configureEach {
     var replaceProperties = [
             minecraft_version      : minecraft_version,
             minecraft_version_range: minecraft_version_range,
-            neo_version            : neo_version,
+            neo_version            : forge_version,
             neo_version_range      : neo_version_range,
             loader_version_range   : loader_version_range,
             mod_id                 : mod_id,
