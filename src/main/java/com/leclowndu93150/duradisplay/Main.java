@@ -25,6 +25,7 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import javax.annotation.Nullable;
 
+
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod(Main.MODID)
 public class Main
@@ -76,48 +77,57 @@ public class Main
 
     private record DuraDisplay(@Nullable CustomDisplayItem customDisplayItem, DisplayType type) implements IItemDecorator {
         public boolean render(GuiGraphics guiGraphics, Font font, ItemStack stack, int xPosition, int yPosition) {
-            if (!stack.isEmpty() && stack.isBarVisible()) {
-                LazyOptional<IEnergyStorage> energyStorage = stack.getCapability(ForgeCapabilities.ENERGY);
-                DisplayType type = type();
-                // Give energystorage a higer prio than durability
-                if (energyStorage.isPresent()) {
-                    type = DisplayType.ENERGY;
+            if(KeyBind.ForgeClient.modEnabled){
+                if (!stack.isEmpty() && stack.isBarVisible()) {
+                    LazyOptional<IEnergyStorage> energyStorage = stack.getCapability(ForgeCapabilities.ENERGY);
+                    DisplayType type = type();
+                    // Give energystorage a higer prio than durability
+                    if (energyStorage.isPresent()) {
+                        type = DisplayType.ENERGY;
+                    }
+                    switch (type) {
+                        case DURABILITY:
+                            if (stack.isDamaged()) {
+                                int damage = stack.getDamageValue();
+                                int maxDamage = stack.getMaxDamage();
+                                double durabilityPercentage = ((double) (maxDamage - damage) / (double) maxDamage) * 100D;
+                                renderText(guiGraphics, font, String.format("%.0f%%", durabilityPercentage), xPosition, yPosition, stack.getItem().getBarColor(stack)); // Default color white
+                            }
+                            break;
+                        case ENERGY:
+                            if (energyStorage.isPresent()) {
+                                energyStorage.ifPresent(es -> {
+                                    System.out.println("Found energy item: " + stack.getItem());
+                                    int energyStored = es.getEnergyStored();
+                                    int maxEnergyStorage = es.getMaxEnergyStored();
+                                    double energyPercentage = ((double) energyStored / (double) maxEnergyStorage) * 100D;
+                                    renderText(guiGraphics, font, String.format("%.0f%%", energyPercentage), xPosition, yPosition, 0x34D8EB); // Custom color for energy display
+                                });
+                            } else {
+                                int l = stack.getBarWidth();
+                                int i = stack.getBarColor();
+                                int j = xPosition + 2;
+                                int k = yPosition + 13;
+                                guiGraphics.fill(RenderType.guiOverlay(), j, k, j + 13, k + 2, -16777216);
+                                guiGraphics.fill(RenderType.guiOverlay(), j, k, j + l, k + 1, i | 0xFF000000);
+                            }
+                            break;
+                        case CUSTOM:
+                            if (customDisplayItem != null && customDisplayItem.shouldDisplay(stack)) {
+                                double energyPercentage = customDisplayItem.getPercentage(stack);
+                                int color = customDisplayItem.getColor(stack); // Get color dynamically
+                                renderText(guiGraphics, font, String.format("%.0f%%", energyPercentage), xPosition, yPosition, color); // Use custom color
+                            }
+                            break;
+                    }
                 }
-                switch (type) {
-                    case DURABILITY:
-                        if (stack.isDamaged()) {
-                            int damage = stack.getDamageValue();
-                            int maxDamage = stack.getMaxDamage();
-                            double durabilityPercentage = ((double) (maxDamage - damage) / (double) maxDamage) * 100D;
-                            renderText(guiGraphics, font, String.format("%.0f%%", durabilityPercentage), xPosition, yPosition, stack.getItem().getBarColor(stack)); // Default color white
-                        }
-                        break;
-                    case ENERGY:
-                        if (energyStorage.isPresent()) {
-                            energyStorage.ifPresent(es -> {
-                                System.out.println("Found energy item: " + stack.getItem());
-                                int energyStored = es.getEnergyStored();
-                                int maxEnergyStorage = es.getMaxEnergyStored();
-                                double energyPercentage = ((double) energyStored / (double) maxEnergyStorage) * 100D;
-                                renderText(guiGraphics, font, String.format("%.0f%%", energyPercentage), xPosition, yPosition, 0x34D8EB); // Custom color for energy display
-                            });
-                        } else {
-                            int l = stack.getBarWidth();
-                            int i = stack.getBarColor();
-                            int j = xPosition + 2;
-                            int k = yPosition + 13;
-                            guiGraphics.fill(RenderType.guiOverlay(), j, k, j + 13, k + 2, -16777216);
-                            guiGraphics.fill(RenderType.guiOverlay(), j, k, j + l, k + 1, i | 0xFF000000);
-                        }
-                        break;
-                    case CUSTOM:
-                        if (customDisplayItem != null && customDisplayItem.shouldDisplay(stack)) {
-                            double energyPercentage = customDisplayItem.getPercentage(stack);
-                            int color = customDisplayItem.getColor(stack); // Get color dynamically
-                            renderText(guiGraphics, font, String.format("%.0f%%", energyPercentage), xPosition, yPosition, color); // Use custom color
-                        }
-                        break;
-                }
+            } else if(stack.isBarVisible()){
+                int l = stack.getBarWidth();
+                int i = stack.getBarColor();
+                int j = xPosition + 2;
+                int k = yPosition + 13;
+                guiGraphics.fill(RenderType.guiOverlay(), j, k, j + 13, k + 2, -16777216);
+                guiGraphics.fill(RenderType.guiOverlay(), j, k, j + l, k + 1, i | 0xFF000000);
             }
             return false;
         }
