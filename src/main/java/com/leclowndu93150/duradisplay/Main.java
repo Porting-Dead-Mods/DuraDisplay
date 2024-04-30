@@ -3,15 +3,14 @@ package com.leclowndu93150.duradisplay;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraft.client.gui.GuiComponent;
 
 
 // The value here should match an entry in the META-INF/mods.toml file
@@ -57,8 +56,8 @@ public class Main
                                 int i = stack.getBarColor();
                                 int j = xPosition + 2;
                                 int k = yPosition + 13;
-                                GuiComponent.fill(RenderType.guiOverlay(), j, k, j + 13, k + 2, -16777216);
-                                GuiComponent.fill(RenderType.guiOverlay(), j, k, j + l, k + 1, i | 0xFF000000);
+                                GuiComponent.fill(new PoseStack(), j, k, j + 13, k + 2, -16777216);
+                                GuiComponent.fill(new PoseStack(), j, k, j + l, k + 1, i | 0xFF000000);
                             }
                             break;
                     }
@@ -68,8 +67,8 @@ public class Main
                 int i = stack.getBarColor();
                 int j = xPosition + 2;
                 int k = yPosition + 13;
-                GuiComponent.fill(RenderType.guiOverlay(), j, k, j + 13, k + 2, -16777216);
-                GuiComponent.fill(RenderType.guiOverlay(), j, k, j + l, k + 1, i | 0xFF000000);
+                GuiComponent.fill(new PoseStack(), j, k, j + 13, k + 2, -16777216);
+                GuiComponent.fill(new PoseStack(), j, k, j + l, k + 1, i | 0xFF000000);
             }
             return false;
         }
@@ -83,7 +82,7 @@ public class Main
             poseStack.scale(0.5F, 0.5F, 0.5F);
             poseStack.translate(0.0D, 0.0D, 500.0D);
             MultiBufferSource.BufferSource multibuffersource$buffersource = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
-            font.drawInBatch(text, x, y, color, true, poseStack.last().pose(), multibuffersource$buffersource, Font.DisplayMode.NORMAL, 0, 15728880, false);
+            font.drawInBatch(text, x, y, color, true, poseStack.last().pose(), multibuffersource$buffersource, true, 0, 15728880, false);
             multibuffersource$buffersource.endBatch();
             poseStack.popPose();
         }

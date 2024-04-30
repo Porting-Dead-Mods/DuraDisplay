@@ -13,26 +13,24 @@ import static com.leclowndu93150.duradisplay.Main.MODID;
 @Mod.EventBusSubscriber(modid = MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class KeyBind {
 
-    public static KeyMapping KeyMappingDura;
-
-    public static void init() {
-        KeyMappingDura = registerKey("toggle_display", KeyMapping.CATEGORY_GAMEPLAY, InputConstants.KEY_B);
-    }
-
-
-    private static KeyMapping registerKey(String name, String category, int keycode) {
-        final var key = new KeyMapping("key." + Main.MODID + "." + "toggle_display", keycode, category);
+    private static KeyMapping registerKey() {
+        final var key = new KeyMapping("key." + Main.MODID + "." + "toggle_display", InputConstants.KEY_B, KeyMapping.CATEGORY_MISC);
         ClientRegistry.registerKeyBinding(key);
         return key;
     }
 
+
+
     @Mod.EventBusSubscriber(modid = Main.MODID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
     public static class ForgeClient {
+
         public static boolean modEnabled = true;
+        public static final KeyMapping KEY = registerKey();
+
         @SubscribeEvent
         public static void onClientTick(TickEvent.ClientTickEvent event) {
             if (event.phase == TickEvent.Phase.END) {
-                while (KeyMappingDura.consumeClick()) {
+                while (KEY.consumeClick()) {
                     modEnabled = !modEnabled;
                 }
             }
