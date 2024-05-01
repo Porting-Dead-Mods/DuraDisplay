@@ -51,7 +51,7 @@ public class Main
                                     double energyPercentage = ((double) energyStored / (double) maxEnergyStorage) * 100D;
                                     renderText(font, String.format("%.0f%%", energyPercentage), xPosition, yPosition, 0x34D8EB); // Custom color for energy display
                                 });
-                            } else {
+                            } else{
                                 int l = stack.getBarWidth();
                                 int i = stack.getBarColor();
                                 int j = xPosition + 2;
@@ -76,7 +76,7 @@ public class Main
         int y = (yPosition * 2) + 22;
         poseStack.pushPose();
         poseStack.scale(0.5F, 0.5F, 0.5F);
-        poseStack.translate(0.0D, 0.0D, 500.0D);
+        poseStack.translate(0.0D, 0.0D, 750.0D);
         MultiBufferSource.BufferSource multibuffersource$buffersource = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
         font.drawInBatch(text, x, y, color, true, poseStack.last().pose(), multibuffersource$buffersource, true, 0, 15728880, false);
         multibuffersource$buffersource.endBatch();

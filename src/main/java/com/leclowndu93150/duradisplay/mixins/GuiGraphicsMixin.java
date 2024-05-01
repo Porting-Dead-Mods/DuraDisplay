@@ -23,7 +23,7 @@ public abstract class GuiGraphicsMixin {
             )
     )
     private boolean disableBarInGui(boolean barVisible) {
-        return !KeyBind.ForgeClient.modEnabled;
+        return !KeyBind.ForgeClient.modEnabled && barVisible;
     }
 
     @Inject(

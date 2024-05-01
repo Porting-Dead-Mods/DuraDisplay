@@ -87,7 +87,6 @@ dependencies {
 }
 
 mixin {
-    // MixinGradle Settings
     add sourceSets.main, 'mixins.duradisplay.refmap.json'
     config 'mixins.duradisplay.json'
 }
