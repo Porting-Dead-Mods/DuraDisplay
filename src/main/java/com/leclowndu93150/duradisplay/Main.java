@@ -2,37 +2,38 @@ package com.leclowndu93150.duradisplay;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
+import com.mojang.logging.LogUtils;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.fml.common.Mod;
+import org.slf4j.Logger;
 
 
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod(Main.MODID)
 public class Main
 {
+    public static final Logger LOGGER = LogUtils.getLogger();
     // Define mod id in a common place for everything to reference
     public static final String MODID = "duradisplay";
 
-    @Mod.EventBusSubscriber(modid = MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
-    private record DuraDisplay(){
-        public boolean render(Font font, ItemStack stack, int xPosition, int yPosition) {
-            if(KeyBind.ForgeClient.modEnabled){
-                if (!stack.isEmpty() && stack.isBarVisible()) {
-                    LazyOptional<IEnergyStorage> energyStorage = stack.getCapability(CapabilityEnergy.ENERGY);
-                    DisplayType type = null;
-                    // Give energystorage a higer prio than durability
-                    if (energyStorage.isPresent()) {
-                        type = DisplayType.ENERGY;
-                    } else if (stack.isDamaged()) {
-                        type = DisplayType.DURABILITY;
-                    }
+    public static boolean renderDurability(Font font, ItemStack stack, int xPosition, int yPosition) {
+        if(KeyBind.ForgeClient.modEnabled){
+            if (!stack.isEmpty() && stack.isBarVisible()) {
+                LazyOptional<IEnergyStorage> energyStorage = stack.getCapability(CapabilityEnergy.ENERGY);
+                DisplayType type = null;
+                // Give energystorage a higer prio than durability
+                if (energyStorage.isPresent()) {
+                    type = DisplayType.ENERGY;
+                } else if (stack.isDamaged()) {
+                    type = DisplayType.DURABILITY;
+                }
+                if (type != null) {
                     switch (type) {
                         case DURABILITY:
                             if (stack.isDamaged()) {
@@ -59,36 +60,31 @@ public class Main
                                 GuiComponent.fill(new PoseStack(), j, k, j + l, k + 1, i | 0xFF000000);
                             }
                             break;
+                        default:
+                            break;
                     }
                 }
-            } else if(stack.isBarVisible()){
-                int l = stack.getBarWidth();
-                int i = stack.getBarColor();
-                int j = xPosition + 2;
-                int k = yPosition + 13;
-                GuiComponent.fill(new PoseStack(), j, k, j + 13, k + 2, -16777216);
-                GuiComponent.fill(new PoseStack(), j, k, j + l, k + 1, i | 0xFF000000);
             }
-            return false;
         }
+        return false;
+    }
 
-        private void renderText(Font font, String text, int xPosition, int yPosition, int color) {
-            PoseStack poseStack = new PoseStack();
-            int stringWidth = font.width(text);
-            int x = ((xPosition + 8) * 2 + 1 + stringWidth / 2 - stringWidth);
-            int y = (yPosition * 2) + 22;
-            poseStack.pushPose();
-            poseStack.scale(0.5F, 0.5F, 0.5F);
-            poseStack.translate(0.0D, 0.0D, 500.0D);
-            MultiBufferSource.BufferSource multibuffersource$buffersource = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
-            font.drawInBatch(text, x, y, color, true, poseStack.last().pose(), multibuffersource$buffersource, true, 0, 15728880, false);
-            multibuffersource$buffersource.endBatch();
-            poseStack.popPose();
-        }
+    private static void renderText(Font font, String text, int xPosition, int yPosition, int color) {
+        PoseStack poseStack = new PoseStack();
+        int stringWidth = font.width(text);
+        int x = ((xPosition + 8) * 2 + 1 + stringWidth / 2 - stringWidth);
+        int y = (yPosition * 2) + 22;
+        poseStack.pushPose();
+        poseStack.scale(0.5F, 0.5F, 0.5F);
+        poseStack.translate(0.0D, 0.0D, 500.0D);
+        MultiBufferSource.BufferSource multibuffersource$buffersource = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
+        font.drawInBatch(text, x, y, color, true, poseStack.last().pose(), multibuffersource$buffersource, true, 0, 15728880, false);
+        multibuffersource$buffersource.endBatch();
+        poseStack.popPose();
+    }
 
-        private enum DisplayType {
-            DURABILITY,
-            ENERGY,
-        }
+    public enum DisplayType {
+        DURABILITY,
+        ENERGY,
     }
 }

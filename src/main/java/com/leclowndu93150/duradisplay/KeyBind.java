@@ -18,9 +18,6 @@ public class KeyBind {
         ClientRegistry.registerKeyBinding(key);
         return key;
     }
-
-
-
     @Mod.EventBusSubscriber(modid = Main.MODID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
     public static class ForgeClient {
 
