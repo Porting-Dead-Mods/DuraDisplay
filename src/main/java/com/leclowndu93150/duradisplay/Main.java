@@ -14,6 +14,8 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.client.event.RegisterItemDecorationsEvent;
 import net.neoforged.neoforge.registries.DeferredRegister;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
@@ -24,6 +26,9 @@ import java.util.function.UnaryOperator;
 public class Main {
     // Define mod id in a common place for everything to reference
     public static final String MODID = "duradisplay";
+
+    public static Logger LOGGER = LogManager.getLogger(MODID);
+
     private static final DeferredRegister<DataComponentType<?>> DATA_COMPONENTS = DeferredRegister.create(BuiltInRegistries.DATA_COMPONENT_TYPE, MODID);
     protected static Supplier<DataComponentType<Integer>> TEST_DATA;
 
@@ -51,7 +56,9 @@ public class Main {
                 if (item instanceof CustomDisplayItem customDisplayItem) {
                     // Item has custom display behavior, so we pass the
                     // customDisplayItem to the duradisplay
-                    System.out.println("Found custom display item: "+item);
+
+                    // LOGGER.info("Found custom display item: "+item);
+
                     event.register(item, new DuraDisplay(customDisplayItem, DuraDisplay.DisplayType.CUSTOM));
                 } else if (item.getDefaultInstance().isDamageableItem()) {
                     // Item has durability, so we pass null and therefore use

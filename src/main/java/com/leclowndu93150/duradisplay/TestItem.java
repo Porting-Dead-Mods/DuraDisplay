@@ -1,7 +1,6 @@
 package com.leclowndu93150.duradisplay;
 
 import com.leclowndu93150.duradisplay.api.CustomDisplayItem;
-import net.minecraft.core.component.DataComponentType;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
@@ -24,7 +23,7 @@ public class TestItem extends Item implements CustomDisplayItem {
     public int getPercentage(ItemStack stack) {
         int maxTest = 100;
         float test = (float) (maxTest - stack.getOrDefault(Main.TEST_DATA, 0)) / maxTest;
-        System.out.println("Percentage: "+test * 100);
+        Main.LOGGER.info("Percentage: {}%", test * 100);
         return (int) (test * 100);
     }
 
@@ -34,7 +33,7 @@ public class TestItem extends Item implements CustomDisplayItem {
     }
 
     @Override
-    public @NotNull InteractionResultHolder<ItemStack> use(Level pLevel, Player pPlayer, InteractionHand pUsedHand) {
+    public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level pLevel, Player pPlayer, @NotNull InteractionHand pUsedHand) {
         ItemStack itemInHand = pPlayer.getItemInHand(pUsedHand);
         itemInHand.set(Main.TEST_DATA, itemInHand.getOrDefault(Main.TEST_DATA, 0) + 1);
         return InteractionResultHolder.success(itemInHand);

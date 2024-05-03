@@ -11,11 +11,12 @@ import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.client.IItemDecorator;
 import net.neoforged.neoforge.energy.IEnergyStorage;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 
 public record DuraDisplay(@Nullable CustomDisplayItem customDisplayItem, DisplayType type) implements IItemDecorator {
-    public boolean render(GuiGraphics guiGraphics, Font font, ItemStack stack, int xPosition, int yPosition) {
+    public boolean render(@NotNull GuiGraphics guiGraphics, @NotNull Font font, ItemStack stack, int xPosition, int yPosition) {
         if (!stack.isEmpty() && (stack.isBarVisible() || (customDisplayItem != null && customDisplayItem.shouldDisplay(stack)))) {
             IEnergyStorage energyStorage = stack.getCapability(Capabilities.EnergyStorage.ITEM);
             DisplayType type = type();
@@ -34,7 +35,7 @@ public record DuraDisplay(@Nullable CustomDisplayItem customDisplayItem, Display
                 }
                 case ENERGY -> {
                     if (energyStorage != null) {
-                        System.out.println("Found energy item: "+stack.getItem());
+                        // Main.LOGGER.info("Found energy item: {}", stack.getItem());
                         int energyStored = energyStorage.getEnergyStored();
                         int maxEnergyStorage = energyStorage.getMaxEnergyStored();
                         double energyPercentage = ((double) energyStored / (double) maxEnergyStorage) * 100D;
