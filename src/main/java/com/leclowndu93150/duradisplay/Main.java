@@ -1,8 +1,9 @@
 package com.leclowndu93150.duradisplay;
 
 import com.leclowndu93150.duradisplay.api.CustomDisplayItem;
-import com.leclowndu93150.duradisplay.compat.DependencyHandler;
+import com.leclowndu93150.duradisplay.compat.BuiltinCompat;
 import com.leclowndu93150.duradisplay.compat.HTCompat;
+import com.leclowndu93150.duradisplay.renderer.DuraDisplay;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import net.minecraft.SharedConstants;
@@ -11,6 +12,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.item.BundleItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
@@ -28,6 +30,8 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
 
 
 // The value here should match an entry in the META-INF/mods.toml file
@@ -35,6 +39,8 @@ import javax.annotation.Nullable;
 public class Main {
     // Define mod id in a common place for everything to reference
     public static final String MODID = "duradisplay";
+
+    public static final List<BuiltinCompat.CompatSupplier> BUILTIN_COMPATS = new ArrayList<>();
 
     public Main() {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
@@ -44,6 +50,61 @@ public class Main {
             ITEMS.register("test_item", TestItem::new);
             ITEMS.register(modEventBus);
         }
+        registerCompats();
+    }
+
+    private static void registerCompats() {
+        // NOTE: The order this is registered in determines its priority
+        // Custom
+        registerCompat(itemStack -> {
+            if (itemStack.getItem() instanceof CustomDisplayItem item) {
+                return new BuiltinCompat(item.getPercentage(itemStack), item.getColor(itemStack), item.shouldDisplay(itemStack));
+            }
+            return null;
+        });
+        // Energy
+        registerCompat(itemStack -> {
+            LazyOptional<IEnergyStorage> energyStorage = itemStack.getCapability(ForgeCapabilities.ENERGY);
+            if (energyStorage.isPresent()) {
+                IEnergyStorage energyStorage1 = energyStorage.orElseThrow(NullPointerException::new);
+                return new BuiltinCompat(
+                        ((double) energyStorage1.getEnergyStored() / (double) energyStorage1.getMaxEnergyStored()) * 100D,
+                        itemStack.getItem().getBarColor(itemStack),
+                        itemStack.isBarVisible()
+                );
+            }
+            return null;
+        });
+        // Damage
+        registerCompat(itemStack -> {
+            if (itemStack.isDamageableItem()) {
+                int damage = itemStack.getDamageValue();
+                int maxDamage = itemStack.getMaxDamage();
+                double durabilityPercentage = ((double) (maxDamage - damage) / (double) maxDamage) * 100D;
+                return new BuiltinCompat(durabilityPercentage, itemStack.getBarColor(), itemStack.isBarVisible());
+            }
+            return null;
+        });
+        // Hardcore torches
+        registerCompat(itemStack -> {
+            if (ModList.get().isLoaded("hardcore_torches")) {
+                HTCompat compat = HTCompat.from(itemStack);
+                return compat == null ? null : compat.registerCompat();
+            }
+            return null;
+        });
+        // Bundle
+        registerCompat(itemStack -> {
+            if (itemStack.getItem() instanceof BundleItem) {
+                double percentage = BundleItem.getFullnessDisplay(itemStack) * 100D;
+                return new BuiltinCompat(percentage, itemStack.getBarColor(), itemStack.isBarVisible());
+            }
+            return null;
+        });
+    }
+
+    private static void registerCompat(BuiltinCompat.CompatSupplier supplier) {
+        BUILTIN_COMPATS.add(supplier);
     }
 
     @Mod.EventBusSubscriber(modid = MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
@@ -51,104 +112,9 @@ public class Main {
         @SubscribeEvent
         public static void onRegisterItemDecorations(final RegisterItemDecorationsEvent event) {
             for (Item item : BuiltInRegistries.ITEM) {
-                if (item instanceof CustomDisplayItem customDisplayItem) {
-                    // Item has custom display behavior, so we pass the
-                    // customDisplayItem to the duradisplay
-                    event.register(item, new DuraDisplay(customDisplayItem, DuraDisplay.DisplayType.CUSTOM));
-                } else if (item.canBeDepleted()) {
-                    // Item has durability, so we pass null and therefore use
-                    // builtin behavior
-                    event.register(item, new DuraDisplay(null, DuraDisplay.DisplayType.DURABILITY));
-                } else if (ForgeRegistries.ITEMS.getKey(item).getNamespace().equals("hardcore_torches")) {
-                    event.register(item, new DuraDisplay(null, DuraDisplay.DisplayType.HARDCORE_TORCHES));
-                } else {
-                    // Item has energy or is a regular item, so we pass null and therefore use
-                    // builtin behavior
-                    event.register(item, new DuraDisplay(null, DuraDisplay.DisplayType.ENERGY));
-                }
+                System.out.println("Registering the item decoration");
+                event.register(item, new DuraDisplay());
             }
-        }
-    }
-
-    public record DuraDisplay(@Nullable CustomDisplayItem customDisplayItem,
-                              DisplayType type) implements IItemDecorator {
-        public boolean render(GuiGraphics guiGraphics, Font font, ItemStack stack, int xPosition, int yPosition) {
-            if (KeyBind.ForgeClient.modEnabled) {
-                if (!stack.isEmpty() && stack.isBarVisible()) {
-                    LazyOptional<IEnergyStorage> energyStorage = stack.getCapability(ForgeCapabilities.ENERGY);
-                    DisplayType type = type();
-                    // Give energystorage a higer prio than durability
-                    if (energyStorage.isPresent()) {
-                        type = DisplayType.ENERGY;
-                    }
-                    switch (type) {
-                        case DURABILITY:
-                            if (stack.isDamaged()) {
-                                int damage = stack.getDamageValue();
-                                int maxDamage = stack.getMaxDamage();
-                                double durabilityPercentage = ((double) (maxDamage - damage) / (double) maxDamage) * 100D;
-                                renderText(guiGraphics, font, String.format("%.0f%%", durabilityPercentage), xPosition, yPosition, stack.getItem().getBarColor(stack)); // Default color white
-                            }
-                            break;
-                        case ENERGY:
-                            if (energyStorage.isPresent()) {
-                                energyStorage.ifPresent(es -> {
-                                    int energyStored = es.getEnergyStored();
-                                    int maxEnergyStorage = es.getMaxEnergyStored();
-                                    double energyPercentage = ((double) energyStored / (double) maxEnergyStorage) * 100D;
-                                    renderText(guiGraphics, font, String.format("%.0f%%", energyPercentage), xPosition, yPosition, 0x34D8EB); // Custom color for energy display
-                                });
-                            }
-                            if (ModList.get().isLoaded("hardcore_torches")) {
-                                DependencyHandler.ifHTloaded(stack,this,guiGraphics,font,xPosition,yPosition);
-                            } else {
-                                int l = stack.getBarWidth();
-                                int i = stack.getBarColor();
-                                int j = xPosition + 2;
-                                int k = yPosition + 13;
-                                guiGraphics.fill(RenderType.guiOverlay(), j, k, j + 13, k + 2, -16777216);
-                                guiGraphics.fill(RenderType.guiOverlay(), j, k, j + l, k + 1, i | 0xFF000000);
-                            }
-                            break;
-                        case CUSTOM:
-                            if (customDisplayItem != null && customDisplayItem.shouldDisplay(stack)) {
-                                double energyPercentage = customDisplayItem.getPercentage(stack);
-                                int color = customDisplayItem.getColor(stack); // Get color dynamically
-                                renderText(guiGraphics, font, String.format("%.0f%%", energyPercentage), xPosition, yPosition, color); // Use custom color
-                            }
-                            break;
-                    }
-                }
-            } else if (stack.isBarVisible()) {
-                int l = stack.getBarWidth();
-                int i = stack.getBarColor();
-                int j = xPosition + 2;
-                int k = yPosition + 13;
-                guiGraphics.fill(RenderType.guiOverlay(), j, k, j + 13, k + 2, -16777216);
-                guiGraphics.fill(RenderType.guiOverlay(), j, k, j + l, k + 1, i | 0xFF000000);
-            }
-            return false;
-        }
-
-        public void renderText(GuiGraphics guiGraphics, Font font, String text, int xPosition, int yPosition, int color) {
-            PoseStack poseStack = guiGraphics.pose();
-            int stringWidth = font.width(text);
-            int x = ((xPosition + 8) * 2 + 1 + stringWidth / 2 - stringWidth);
-            int y = (yPosition * 2) + 22;
-            poseStack.pushPose();
-            poseStack.scale(0.5F, 0.5F, 0.5F);
-            poseStack.translate(0.0D, 0.0D, 500.0D);
-            MultiBufferSource.BufferSource multibuffersource$buffersource = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
-            font.drawInBatch(text, x, y, color, true, poseStack.last().pose(), multibuffersource$buffersource, Font.DisplayMode.NORMAL, 0, 15728880, false);
-            multibuffersource$buffersource.endBatch();
-            poseStack.popPose();
-        }
-
-        public enum DisplayType {
-            DURABILITY,
-            ENERGY,
-            CUSTOM,
-            HARDCORE_TORCHES,
         }
     }
 }

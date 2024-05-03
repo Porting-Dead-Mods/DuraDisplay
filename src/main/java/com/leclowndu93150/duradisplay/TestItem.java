@@ -24,8 +24,7 @@ public class TestItem extends Item implements CustomDisplayItem {
     @Override
     public int getPercentage(ItemStack stack) {
         int maxTest = stack.getOrCreateTag().getInt("maxTest");
-        float test = (float) (maxTest - stack.getOrCreateTag().getInt("test")) / maxTest;
-        return (int) (test * 100);
+        return ((maxTest - stack.getOrCreateTag().getInt("test")) / maxTest) * 100;
     }
 
     @Override

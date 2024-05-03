@@ -1,30 +1,39 @@
 package com.leclowndu93150.duradisplay.compat;
 
+import com.github.wolfiewaffle.hardcore_torches.config.Config;
 import com.github.wolfiewaffle.hardcore_torches.item.LanternItem;
+import com.github.wolfiewaffle.hardcore_torches.item.OilCanItem;
 import com.github.wolfiewaffle.hardcore_torches.item.TorchItem;
-import com.leclowndu93150.duradisplay.Main;
-import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
-public class HTCompat {
+import javax.annotation.Nullable;
 
-
-    HTCompat(ItemStack stack, Main.DuraDisplay display, GuiGraphics guiGraphics, Font font,int xPosition, int yPosition){
-        int fuelStored;
-        int maxFuelStorage;
-        if (stack.getItem() instanceof TorchItem item) {
-            fuelStored = TorchItem.getFuel(stack);
-            maxFuelStorage = item.getMaxFuel();
-            double fuelPercentage = ((double) fuelStored / (double) maxFuelStorage) * 100D;
-            display.renderText(guiGraphics, font, String.format("%.0f%%", fuelPercentage), xPosition, yPosition, 0xe3bb56); // Custom color for energy display
-        } else if (stack.getItem() instanceof LanternItem item) {
-            fuelStored = LanternItem.getFuel(stack);
-            maxFuelStorage = item.getMaxFuel();
-            double fuelPercentage = ((double) fuelStored / (double) maxFuelStorage) * 100D;
-            display.renderText(guiGraphics, font, String.format("%.0f%%", fuelPercentage), xPosition, yPosition, 0xe3bb56); // Custom color for energy display
+public record HTCompat(ItemStack itemStack) {
+    public BuiltinCompat registerCompat() {
+        // TODO: in 1.20.5+, replace this with a pattern switch
+        int stored, maxStored;
+        Item item1 = itemStack.getItem();
+        if (item1 instanceof TorchItem item) {
+            stored = TorchItem.getFuel(itemStack);
+            maxStored = item.getMaxFuel();
+        } else if (item1 instanceof LanternItem item) {
+            stored = LanternItem.getFuel(itemStack);
+            maxStored = item.getMaxFuel();
+        } else if (item1 instanceof OilCanItem) {
+            stored = OilCanItem.getFuel(itemStack);
+            maxStored = Config.maxCanFuel.get();
+        } else {
+            stored = 0;
+            maxStored = 0;
         }
-        }
+        return new BuiltinCompat(((double) stored / (double) maxStored) * 100D,0xe3bb56, itemStack.isBarVisible());
     }
 
+    public static @Nullable HTCompat from(ItemStack itemStack) {
+        Item item = itemStack.getItem();
+        if (item instanceof TorchItem || item instanceof LanternItem || item instanceof OilCanItem)
+            return new HTCompat(itemStack);
+        return null;
+    }
+}
