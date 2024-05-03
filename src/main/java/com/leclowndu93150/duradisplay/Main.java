@@ -1,6 +1,8 @@
 package com.leclowndu93150.duradisplay;
 
 import com.leclowndu93150.duradisplay.api.CustomDisplayItem;
+import com.leclowndu93150.duradisplay.compat.DependencyHandler;
+import com.leclowndu93150.duradisplay.compat.HTCompat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import net.minecraft.SharedConstants;
@@ -19,26 +21,25 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
+
 import javax.annotation.Nullable;
 
 
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod(Main.MODID)
-public class Main
-{
+public class Main {
     // Define mod id in a common place for everything to reference
     public static final String MODID = "duradisplay";
 
-    public Main()
-    {
+    public Main() {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         // Only register items if running in-dev
-        if (SharedConstants.IS_RUNNING_IN_IDE)
-        {
+        if (SharedConstants.IS_RUNNING_IN_IDE) {
             DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, MODID);
             ITEMS.register("test_item", TestItem::new);
             ITEMS.register(modEventBus);
@@ -46,38 +47,33 @@ public class Main
     }
 
     @Mod.EventBusSubscriber(modid = MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
-    public static class ClientEvents
-    {
+    public static class ClientEvents {
         @SubscribeEvent
-        public static void onRegisterItemDecorations(final RegisterItemDecorationsEvent event)
-        {
-            for (Item item : BuiltInRegistries.ITEM)
-            {
-                    if (item instanceof CustomDisplayItem customDisplayItem)
-                    {
-                        // Item has custom display behavior, so we pass the
-                        // customDisplayItem to the duradisplay
-                        event.register(item, new DuraDisplay(customDisplayItem, DuraDisplay.DisplayType.CUSTOM));
-                    }
-                    else if (item.canBeDepleted())
-                    {
-                        // Item has durability, so we pass null and therefore use
-                        // builtin behavior
-                        event.register(item, new DuraDisplay(null, DuraDisplay.DisplayType.DURABILITY));
-                    }
-                    else
-                    {
-                        // Item has energy or is a regular item, so we pass null and therefore use
-                        // builtin behavior
-                        event.register(item, new DuraDisplay(null, DuraDisplay.DisplayType.ENERGY));
-                    }
+        public static void onRegisterItemDecorations(final RegisterItemDecorationsEvent event) {
+            for (Item item : BuiltInRegistries.ITEM) {
+                if (item instanceof CustomDisplayItem customDisplayItem) {
+                    // Item has custom display behavior, so we pass the
+                    // customDisplayItem to the duradisplay
+                    event.register(item, new DuraDisplay(customDisplayItem, DuraDisplay.DisplayType.CUSTOM));
+                } else if (item.canBeDepleted()) {
+                    // Item has durability, so we pass null and therefore use
+                    // builtin behavior
+                    event.register(item, new DuraDisplay(null, DuraDisplay.DisplayType.DURABILITY));
+                } else if (ForgeRegistries.ITEMS.getKey(item).getNamespace().equals("hardcore_torches")) {
+                    event.register(item, new DuraDisplay(null, DuraDisplay.DisplayType.HARDCORE_TORCHES));
+                } else {
+                    // Item has energy or is a regular item, so we pass null and therefore use
+                    // builtin behavior
+                    event.register(item, new DuraDisplay(null, DuraDisplay.DisplayType.ENERGY));
+                }
             }
         }
     }
 
-    private record DuraDisplay(@Nullable CustomDisplayItem customDisplayItem, DisplayType type) implements IItemDecorator {
+    public record DuraDisplay(@Nullable CustomDisplayItem customDisplayItem,
+                              DisplayType type) implements IItemDecorator {
         public boolean render(GuiGraphics guiGraphics, Font font, ItemStack stack, int xPosition, int yPosition) {
-            if(KeyBind.ForgeClient.modEnabled){
+            if (KeyBind.ForgeClient.modEnabled) {
                 if (!stack.isEmpty() && stack.isBarVisible()) {
                     LazyOptional<IEnergyStorage> energyStorage = stack.getCapability(ForgeCapabilities.ENERGY);
                     DisplayType type = type();
@@ -97,12 +93,14 @@ public class Main
                         case ENERGY:
                             if (energyStorage.isPresent()) {
                                 energyStorage.ifPresent(es -> {
-                                    System.out.println("Found energy item: " + stack.getItem());
                                     int energyStored = es.getEnergyStored();
                                     int maxEnergyStorage = es.getMaxEnergyStored();
                                     double energyPercentage = ((double) energyStored / (double) maxEnergyStorage) * 100D;
                                     renderText(guiGraphics, font, String.format("%.0f%%", energyPercentage), xPosition, yPosition, 0x34D8EB); // Custom color for energy display
                                 });
+                            }
+                            if (ModList.get().isLoaded("hardcore_torches")) {
+                                DependencyHandler.ifHTloaded(stack,this,guiGraphics,font,xPosition,yPosition);
                             } else {
                                 int l = stack.getBarWidth();
                                 int i = stack.getBarColor();
@@ -121,7 +119,7 @@ public class Main
                             break;
                     }
                 }
-            } else if(stack.isBarVisible()){
+            } else if (stack.isBarVisible()) {
                 int l = stack.getBarWidth();
                 int i = stack.getBarColor();
                 int j = xPosition + 2;
@@ -132,7 +130,7 @@ public class Main
             return false;
         }
 
-        private void renderText(GuiGraphics guiGraphics, Font font, String text, int xPosition, int yPosition, int color) {
+        public void renderText(GuiGraphics guiGraphics, Font font, String text, int xPosition, int yPosition, int color) {
             PoseStack poseStack = guiGraphics.pose();
             int stringWidth = font.width(text);
             int x = ((xPosition + 8) * 2 + 1 + stringWidth / 2 - stringWidth);
@@ -146,10 +144,11 @@ public class Main
             poseStack.popPose();
         }
 
-        private enum DisplayType {
+        public enum DisplayType {
             DURABILITY,
             ENERGY,
             CUSTOM,
+            HARDCORE_TORCHES,
         }
     }
 }
