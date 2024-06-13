@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.injection.At;
 @Mixin(value = GuiGraphics.class)
 public abstract class GuiGraphicsMixin {
     @ModifyExpressionValue(
-            method = "Lnet/minecraft/client/gui/GuiGraphics;renderItemDecorations(Lnet/minecraft/client/gui/Font;Lnet/minecraft/world/item/ItemStack;IILjava/lang/String;)V",
+            method = "renderItemDecorations(Lnet/minecraft/client/gui/Font;Lnet/minecraft/world/item/ItemStack;IILjava/lang/String;)V",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/world/item/ItemStack;isBarVisible()Z"

@@ -1,6 +1,6 @@
 package com.leclowndu93150.duradisplay.renderer;
 
-import com.leclowndu93150.duradisplay.api.CustomDisplayItem;
+import com.leclowndu93150.duradisplay.KeyBind;
 import com.leclowndu93150.duradisplay.compat.BuiltinCompat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
@@ -9,12 +9,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.client.IItemDecorator;
-import net.neoforged.neoforge.energy.IEnergyStorage;
-import org.jetbrains.annotations.NotNull;
-
-import javax.annotation.Nullable;
 
 import static com.leclowndu93150.duradisplay.Main.BUILTIN_COMPATS;
 
@@ -22,8 +17,8 @@ public record DuraDisplay() implements IItemDecorator {
     @Override
     public boolean render(GuiGraphics guiGraphics, Font font, ItemStack stack, int xPosition, int yPosition) {
         if (!stack.isEmpty() && stack.isBarVisible()) {
-            // TODO: Port keybinds to 1.21
-            //if (KeyBind.ForgeClient.modEnabled) {
+
+            if (KeyBind.ForgeClient.modEnabled) {
                 for (BuiltinCompat.CompatSupplier supplier : BUILTIN_COMPATS) {
                     BuiltinCompat compat = supplier.compat(stack);
                     if (compat != null && compat.active()) {
@@ -32,7 +27,7 @@ public record DuraDisplay() implements IItemDecorator {
                         return true;
                     }
                 }
-            //}
+            }
 
             renderItemBar(stack, xPosition, yPosition, guiGraphics);
         }
