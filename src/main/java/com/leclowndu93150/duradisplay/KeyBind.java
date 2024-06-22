@@ -29,7 +29,7 @@ public class KeyBind {
         public static void onClientTick(InputEvent.Key event) {
             if (DURA_MAPPING.get().consumeClick()) {
                     modEnabled = !modEnabled;
-                }
+            }
         }
     }
 

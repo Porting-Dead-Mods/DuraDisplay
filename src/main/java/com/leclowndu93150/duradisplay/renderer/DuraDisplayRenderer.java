@@ -11,25 +11,38 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.client.IItemDecorator;
 
+import java.util.List;
+
 import static com.leclowndu93150.duradisplay.Main.BUILTIN_COMPATS;
 
-public record DuraDisplay() implements IItemDecorator {
+public class DuraDisplayRenderer implements IItemDecorator {
+    public static final DuraDisplayRenderer INSTANCE = new DuraDisplayRenderer();
+
+    private DuraDisplayRenderer() {
+    }
+
     @Override
     public boolean render(GuiGraphics guiGraphics, Font font, ItemStack stack, int xPosition, int yPosition) {
-        if (!stack.isEmpty() && stack.isBarVisible()) {
-
+        if (!stack.isEmpty()) {
             if (KeyBind.ForgeClient.modEnabled) {
                 for (BuiltinCompat.CompatSupplier supplier : BUILTIN_COMPATS) {
-                    BuiltinCompat compat = supplier.compat(stack);
-                    if (compat != null && compat.active()) {
-                        double percentage = compat.percentage();
-                        renderText(guiGraphics, font, String.format("%.0f%%", percentage), xPosition, yPosition, compat.color());
+                    List<BuiltinCompat> compats = supplier.compat(stack);
+                    if (compats != null && !compats.isEmpty()) {
+                        for (int i = 0; i < compats.size(); i++) {
+                            BuiltinCompat compat = compats.get(i);
+                            if (compat.active()) {
+                                double percentage = compat.percentage();
+                                renderText(guiGraphics, font, String.format("%.0f%%", percentage), xPosition, yPosition - i * 5, compat.color());
+                            }
+                        }
                         return true;
                     }
                 }
             }
 
-            renderItemBar(stack, xPosition, yPosition, guiGraphics);
+            if (stack.isBarVisible()) {
+                renderItemBar(stack, xPosition, yPosition, guiGraphics);
+            }
         }
         return true;
     }

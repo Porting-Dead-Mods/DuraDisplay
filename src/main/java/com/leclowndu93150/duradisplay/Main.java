@@ -2,7 +2,8 @@ package com.leclowndu93150.duradisplay;
 
 import com.leclowndu93150.duradisplay.api.CustomDisplayItem;
 import com.leclowndu93150.duradisplay.compat.BuiltinCompat;
-import com.leclowndu93150.duradisplay.renderer.DuraDisplay;
+import com.leclowndu93150.duradisplay.compat.GTCompat;
+import com.leclowndu93150.duradisplay.renderer.DuraDisplayRenderer;
 import com.mojang.serialization.Codec;
 import net.minecraft.SharedConstants;
 import net.minecraft.core.component.DataComponentType;
@@ -25,6 +26,7 @@ import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
@@ -60,7 +62,14 @@ public class Main {
         // Custom
         registerCompat(itemStack -> {
             if (itemStack.getItem() instanceof CustomDisplayItem item) {
-                return new BuiltinCompat(item.getPercentage(itemStack), item.getColor(itemStack), item.shouldDisplay(itemStack));
+                return Collections.singletonList(new BuiltinCompat(item.getPercentage(itemStack), item.getColor(itemStack), item.shouldDisplay(itemStack)));
+            }
+            return null;
+        });
+        registerCompat(itemStack -> {
+            if (ModList.get().isLoaded("gtceu")) {
+                GTCompat compat = GTCompat.from(itemStack);
+                return compat == null ? null : compat.registerCompat();
             }
             return null;
         });
@@ -68,21 +77,23 @@ public class Main {
         registerCompat(itemStack -> {
             @Nullable IEnergyStorage energyStorage = itemStack.getCapability(Capabilities.EnergyStorage.ITEM);
             if (energyStorage != null) {
-                return new BuiltinCompat(
+                return Collections.singletonList(new BuiltinCompat(
                         ((double) energyStorage.getEnergyStored() / (double) energyStorage.getMaxEnergyStored()) * 100D,
                         itemStack.getItem().getBarColor(itemStack),
                         itemStack.isBarVisible()
-                );
+                ));
             }
             return null;
         });
         // Damage
         registerCompat(itemStack -> {
             if (itemStack.isDamageableItem()) {
-                int damage = itemStack.getDamageValue();
-                int maxDamage = itemStack.getMaxDamage();
-                double durabilityPercentage = ((double) (maxDamage - damage) / (double) maxDamage) * 100D;
-                return new BuiltinCompat(durabilityPercentage, itemStack.getBarColor(), itemStack.isBarVisible());
+                if (ModList.get().isLoaded("gtceu") && GTCompat.from(itemStack) != null) {
+                    int damage = itemStack.getDamageValue();
+                    int maxDamage = itemStack.getMaxDamage();
+                    double durabilityPercentage = ((double) (maxDamage - damage) / (double) maxDamage) * 100D;
+                    return Collections.singletonList(new BuiltinCompat(durabilityPercentage, itemStack.getBarColor(), itemStack.isBarVisible()));
+                }
             }
             return null;
         });
@@ -100,7 +111,7 @@ public class Main {
         registerCompat(itemStack -> {
             if (itemStack.getItem() instanceof BundleItem) {
                 double percentage = BundleItem.getFullnessDisplay(itemStack) * 100D;
-                return new BuiltinCompat(percentage, itemStack.getBarColor(), itemStack.isBarVisible());
+                return Collections.singletonList(new BuiltinCompat(percentage, itemStack.getBarColor(), itemStack.isBarVisible()));
             }
             return null;
         });
@@ -119,8 +130,7 @@ public class Main {
         @SubscribeEvent
         public static void onRegisterItemDecorations(final RegisterItemDecorationsEvent event) {
             for (Item item : BuiltInRegistries.ITEM) {
-                System.out.println("Registering the item decoration");
-                event.register(item, new DuraDisplay());
+                event.register(item, DuraDisplayRenderer.INSTANCE);
             }
         }
     }
