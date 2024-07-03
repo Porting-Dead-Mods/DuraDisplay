@@ -1,4 +1,4 @@
-package com.leclowndu93150.duradisplay;
+package com.portingdeadmods.duradisplay;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
@@ -10,12 +10,12 @@ import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.common.util.Lazy;
 import org.lwjgl.glfw.GLFW;
 
-import static com.leclowndu93150.duradisplay.Main.MODID;
+import static com.portingdeadmods.duradisplay.DuraDisplay.MODID;
 
 @EventBusSubscriber(modid = MODID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
-public class KeyBind {
-    public static final Lazy<KeyMapping> DURA_MAPPING = Lazy.of(() ->new KeyMapping(
-         "Toggle/Disable Display", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_M, "DuraDisplay"));
+public class KeyBinds {
+    public static final Lazy<KeyMapping> DURA_MAPPING = Lazy.of(() -> new KeyMapping(
+            "duradisplay.keybinds.toggle", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_M, "duradisplay.keybinds.category"));
 
     @SubscribeEvent
     public static void registerBindings(RegisterKeyMappingsEvent event) {
@@ -25,10 +25,11 @@ public class KeyBind {
     @EventBusSubscriber(modid = MODID, bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)
     public static class ForgeClient {
         public static boolean modEnabled = true;
+
         @SubscribeEvent
-        public static void onClientTick(InputEvent.Key event) {
+        public static void onKeyPressed(InputEvent.Key event) {
             if (DURA_MAPPING.get().consumeClick()) {
-                    modEnabled = !modEnabled;
+                modEnabled = !modEnabled;
             }
         }
     }

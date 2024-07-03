@@ -1,4 +1,4 @@
-package com.leclowndu93150.duradisplay.compat;
+package com.portingdeadmods.duradisplay.compat;
 
 import com.gregtechceu.gtceu.api.capability.GTCapabilityHelper;
 import com.gregtechceu.gtceu.api.capability.IElectricItem;
@@ -10,16 +10,13 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.util.FastColor;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 public record GTCompat(ItemStack itemStack) {
-    public static final int COLOR_BAR_ENERGY = FastColor.ARGB32.color(255, 0, 101, 178);
-    public static final int COLOR_BAR_DURABILITY = FastColor.ARGB32.color(255, 20, 124, 0);
-    public static final int COLOR_BAR_DEPLETED = FastColor.ARGB32.color(255, 122, 0, 0);
+    public static final int COLOR_BAR_ENERGY = FastColor.ARGB32.color(255, 47, 155, 237);
+    public static final int COLOR_BAR_DURABILITY = FastColor.ARGB32.color(255, 37, 199, 4);
 
     public static @Nullable GTCompat from(ItemStack itemStack) {
         if (itemStack.getItem() instanceof IGTTool || itemStack.getItem() instanceof IComponentItem) {

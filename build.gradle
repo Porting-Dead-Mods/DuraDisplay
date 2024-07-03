@@ -82,8 +82,8 @@ sourceSets.main.resources { srcDir 'src/generated/resources' }
 dependencies {
     implementation "net.neoforged:neoforge:${neo_version}"
 
-    implementation("curse.maven:ldlib-626676:5448179") { transitive = false }
-    implementation("curse.maven:gtceu-890405:5446794") { transitive = false }
+    implementation("curse.maven:ldlib-626676:5472657") { transitive = false }
+    implementation("curse.maven:gtceu-890405:5493708") { transitive = false }
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.

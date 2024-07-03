@@ -1,4 +1,4 @@
-package com.leclowndu93150.duradisplay.compat;
+package com.portingdeadmods.duradisplay.compat;
 
 import net.minecraft.world.item.ItemStack;
 

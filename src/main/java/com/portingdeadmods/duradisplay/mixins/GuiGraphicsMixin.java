@@ -1,16 +1,11 @@
-package com.leclowndu93150.duradisplay.mixins;
+package com.portingdeadmods.duradisplay.mixins;
 
-import com.leclowndu93150.duradisplay.compat.GTCompat;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import net.minecraft.client.gui.Font;
+import com.portingdeadmods.duradisplay.KeyBinds;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.world.item.ItemStack;
-import net.neoforged.fml.ModList;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(GuiGraphics.class)
 public abstract class GuiGraphicsMixin {
@@ -23,7 +18,7 @@ public abstract class GuiGraphicsMixin {
                     target = "Lnet/minecraft/world/item/ItemStack;isBarVisible()Z"
             )
     )
-    private boolean disableBarInGui(boolean barVisible) {
-        return false;
+    private boolean showBarInGui(boolean barVisible) {
+        return !KeyBinds.ForgeClient.modEnabled && barVisible;
     }
 }

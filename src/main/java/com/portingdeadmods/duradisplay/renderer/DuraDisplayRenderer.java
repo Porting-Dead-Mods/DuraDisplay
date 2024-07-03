@@ -1,7 +1,7 @@
-package com.leclowndu93150.duradisplay.renderer;
+package com.portingdeadmods.duradisplay.renderer;
 
-import com.leclowndu93150.duradisplay.KeyBind;
-import com.leclowndu93150.duradisplay.compat.BuiltinCompat;
+import com.portingdeadmods.duradisplay.KeyBinds;
+import com.portingdeadmods.duradisplay.compat.BuiltinCompat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -13,7 +13,7 @@ import net.neoforged.neoforge.client.IItemDecorator;
 
 import java.util.List;
 
-import static com.leclowndu93150.duradisplay.Main.BUILTIN_COMPATS;
+import static com.portingdeadmods.duradisplay.DuraDisplay.BUILTIN_COMPATS;
 
 public class DuraDisplayRenderer implements IItemDecorator {
     public static final DuraDisplayRenderer INSTANCE = new DuraDisplayRenderer();
@@ -24,7 +24,7 @@ public class DuraDisplayRenderer implements IItemDecorator {
     @Override
     public boolean render(GuiGraphics guiGraphics, Font font, ItemStack stack, int xPosition, int yPosition) {
         if (!stack.isEmpty()) {
-            if (KeyBind.ForgeClient.modEnabled) {
+            if (KeyBinds.ForgeClient.modEnabled)
                 for (BuiltinCompat.CompatSupplier supplier : BUILTIN_COMPATS) {
                     List<BuiltinCompat> compats = supplier.compat(stack);
                     if (compats != null && !compats.isEmpty()) {
@@ -38,11 +38,6 @@ public class DuraDisplayRenderer implements IItemDecorator {
                         return true;
                     }
                 }
-            }
-
-            if (stack.isBarVisible()) {
-                renderItemBar(stack, xPosition, yPosition, guiGraphics);
-            }
         }
         return true;
     }

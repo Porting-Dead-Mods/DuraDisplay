@@ -1,9 +1,8 @@
-package com.leclowndu93150.duradisplay;
+package com.portingdeadmods.duradisplay;
 
-import com.leclowndu93150.duradisplay.api.CustomDisplayItem;
-import com.leclowndu93150.duradisplay.compat.BuiltinCompat;
-import com.leclowndu93150.duradisplay.compat.GTCompat;
-import com.leclowndu93150.duradisplay.renderer.DuraDisplayRenderer;
+import com.portingdeadmods.duradisplay.compat.BuiltinCompat;
+import com.portingdeadmods.duradisplay.compat.GTCompat;
+import com.portingdeadmods.duradisplay.renderer.DuraDisplayRenderer;
 import com.mojang.serialization.Codec;
 import net.minecraft.SharedConstants;
 import net.minecraft.core.component.DataComponentType;
@@ -33,39 +32,24 @@ import java.util.function.UnaryOperator;
 
 
 // The value here should match an entry in the META-INF/mods.toml file
-@Mod(Main.MODID)
-public class Main {
+@Mod(DuraDisplay.MODID)
+public class DuraDisplay {
     // Define mod id in a common place for everything to reference
     public static final String MODID = "duradisplay";
     public static Logger LOGGER = LogManager.getLogger(MODID);
 
-    public static final List<BuiltinCompat.CompatSupplier> BUILTIN_COMPATS = new ArrayList<>();
+    public static final List<BuiltinCompat.CompatSupplier> BUILTIN_COMPATS = Collections.synchronizedList(new ArrayList<>());
 
     private static final DeferredRegister<DataComponentType<?>> DATA_COMPONENTS = DeferredRegister.create(BuiltInRegistries.DATA_COMPONENT_TYPE, MODID);
     protected static Supplier<DataComponentType<Integer>> TEST_DATA;
 
-    public Main(IEventBus modEventBus) {
-        // Only register items if running in-dev
-        if (SharedConstants.IS_RUNNING_IN_IDE) {
-            DeferredRegister<Item> ITEMS = DeferredRegister.create(BuiltInRegistries.ITEM, MODID);
-            ITEMS.register("test_item", TestItem::new);
-            ITEMS.register(modEventBus);
-            DATA_COMPONENTS.register(modEventBus);
-            TEST_DATA = registerDataComponentType("test_data",
-                    builder -> builder.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.INT));
-        }
+    public DuraDisplay() {
         registerCompats();
     }
 
     private static void registerCompats() {
         // NOTE: The order this is registered in determines its priority
-        // Custom
-        registerCompat(itemStack -> {
-            if (itemStack.getItem() instanceof CustomDisplayItem item) {
-                return Collections.singletonList(new BuiltinCompat(item.getPercentage(itemStack), item.getColor(itemStack), item.shouldDisplay(itemStack)));
-            }
-            return null;
-        });
+        // Gregtech
         registerCompat(itemStack -> {
             if (ModList.get().isLoaded("gtceu")) {
                 GTCompat compat = GTCompat.from(itemStack);
@@ -85,7 +69,7 @@ public class Main {
             }
             return null;
         });
-        // Damage
+        // Durability
         registerCompat(itemStack -> {
             if (itemStack.isDamageableItem()) {
                 if (ModList.get().isLoaded("gtceu") && GTCompat.from(itemStack) != null) {
@@ -97,8 +81,8 @@ public class Main {
             }
             return null;
         });
-        /*
         // Hardcore torches
+        /*
         registerCompat(itemStack -> {
             if (ModList.get().isLoaded("hardcore_torches")) {
                 HTCompat compat = HTCompat.from(itemStack);
