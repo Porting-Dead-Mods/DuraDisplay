@@ -36,7 +36,7 @@ import java.util.function.UnaryOperator;
 public class DuraDisplay {
     // Define mod id in a common place for everything to reference
     public static final String MODID = "duradisplay";
-    public static Logger LOGGER = LogManager.getLogger(MODID);
+    public static final Logger LOGGER = LogManager.getLogger(MODID);
 
     public static final List<BuiltinCompat.CompatSupplier> BUILTIN_COMPATS = Collections.synchronizedList(new ArrayList<>());
 
@@ -72,7 +72,7 @@ public class DuraDisplay {
         // Durability
         registerCompat(itemStack -> {
             if (itemStack.isDamageableItem()) {
-                if (ModList.get().isLoaded("gtceu") && GTCompat.from(itemStack) != null) {
+                if (ModList.get().isLoaded("gtceu") && GTCompat.from(itemStack) == null) {
                     int damage = itemStack.getDamageValue();
                     int maxDamage = itemStack.getMaxDamage();
                     double durabilityPercentage = ((double) (maxDamage - damage) / (double) maxDamage) * 100D;
