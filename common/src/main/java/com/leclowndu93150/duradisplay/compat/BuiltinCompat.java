@@ -1,4 +1,12 @@
 package com.leclowndu93150.duradisplay.compat;
 
-public class BuiltinCompat {
+import net.minecraft.world.item.ItemStack;
+
+import java.util.List;
+
+public record BuiltinCompat(double percentage, int color, boolean active) {
+    @FunctionalInterface
+    public interface CompatSupplier {
+        List<BuiltinCompat> compat(ItemStack itemStack);
+    }
 }

@@ -1,35 +1,28 @@
 package com.leclowndu93150.duradisplay.platform.services;
 
+import com.leclowndu93150.duradisplay.compat.BuiltinCompat;
+import net.minecraft.world.item.ItemStack;
+
+import java.util.List;
+import java.util.ServiceLoader;
+
 public interface IPlatformHelper {
+    IPlatformHelper INSTANCE = ServiceLoader.load(IPlatformHelper.class).findFirst().orElseThrow();
 
     /**
-     * Gets the name of the current platform
-     *
-     * @return The name of the current platform.
+     * Register platform-specific compat suppliers (GT, Energy, etc.)
      */
-    String getPlatformName();
+    void registerPlatformCompats();
 
     /**
-     * Checks if a mod with the given id is loaded.
-     *
-     * @param modId The mod to check if it is loaded.
-     * @return True if the mod is loaded, false otherwise.
+     * Check if a mod is loaded
      */
-    boolean isModLoaded(String modId);
+    boolean isModLoaded(String modid);
 
     /**
-     * Check if the game is currently in a development environment.
-     *
-     * @return True if in a development environment, false otherwise.
+     * Get platform-specific compat for an item (used for GT/Energy on NeoForge)
      */
-    boolean isDevelopmentEnvironment();
+    List<BuiltinCompat> getPlatformCompat(ItemStack itemStack);
 
-    /**
-     * Gets the name of the environment type as a string.
-     *
-     * @return The name of the environment type.
-     */
-    default String getEnvironmentName() {
-        return isDevelopmentEnvironment() ? "development" : "production";
-    }
+    void registerKeybinds();
 }
