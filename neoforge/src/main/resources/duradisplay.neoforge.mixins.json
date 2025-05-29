@@ -7,7 +7,6 @@
     "GTItemBarRendererMixin"
   ],
   "client": [
-    "MixinTitleScreen"
   ],
   "server": [],
   "injectors": {
