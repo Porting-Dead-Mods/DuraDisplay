@@ -43,8 +43,8 @@ repositories {
 }
 
 dependencies {
-    implementation "curse.maven:gregtechceu-modern-890405:5812613"
-    implementation "curse.maven:ldlib-626676:6260254"
+    compileOnly "curse.maven:gregtechceu-modern-890405:5812613"
+    compileOnly "curse.maven:ldlib-626676:6260254"
 }
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }
