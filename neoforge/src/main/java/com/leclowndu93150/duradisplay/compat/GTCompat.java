@@ -7,7 +7,7 @@ import com.gregtechceu.gtceu.api.item.IGTTool;
 import com.gregtechceu.gtceu.api.item.component.IDurabilityBar;
 import com.gregtechceu.gtceu.api.item.component.IItemComponent;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.util.FastColor;
+import net.minecraft.util.ARGB;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
@@ -15,8 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public record GTCompat(ItemStack itemStack) {
-    public static final int COLOR_BAR_ENERGY = FastColor.ARGB32.color(255, 47, 155, 237);
-    public static final int COLOR_BAR_DURABILITY = FastColor.ARGB32.color(255, 37, 199, 4);
+    public static final int COLOR_BAR_ENERGY = ARGB.color(255, 47, 155, 237);
+    public static final int COLOR_BAR_DURABILITY = ARGB.color(255, 37, 199, 4);
 
     public static @Nullable GTCompat from(ItemStack itemStack) {
         if (itemStack.getItem() instanceof IGTTool || itemStack.getItem() instanceof IComponentItem) {

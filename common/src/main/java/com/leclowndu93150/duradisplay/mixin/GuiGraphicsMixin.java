@@ -7,29 +7,31 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(GuiGraphics.class)
-public abstract class GuiGraphicsMixin {
-    @Shadow public abstract boolean containsPointInScissor(int pX, int pY);
+public class GuiGraphicsMixin {
 
-    @ModifyExpressionValue(
-            method = "renderItemDecorations(Lnet/minecraft/client/gui/Font;Lnet/minecraft/world/item/ItemStack;IILjava/lang/String;)V",
+    @Redirect(
+            method = "renderItemBar(Lnet/minecraft/world/item/ItemStack;II)V",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/world/item/ItemStack;isBarVisible()Z"
             )
     )
-    private boolean showBarInGui(boolean barVisible) {
-        return !Config.isEnabled() && barVisible;
+    private boolean hideDefaultDurabilityBar(ItemStack stack) {
+        return stack.isBarVisible() && !Config.isEnabled();
     }
 
-    @Inject(method = "renderItemDecorations(Lnet/minecraft/client/gui/Font;Lnet/minecraft/world/item/ItemStack;IILjava/lang/String;)V",
-            at = @At("TAIL"))
-    private void renderDuraDisplayDecorations(Font font, ItemStack stack, int x, int y, String text, CallbackInfo ci) {
+
+    @Inject(
+            method = "renderItemDecorations(Lnet/minecraft/client/gui/Font;Lnet/minecraft/world/item/ItemStack;IILjava/lang/String;)V",
+            at = @At("TAIL")
+    )
+    private void renderCustomDurabilityDisplay(Font font, ItemStack stack, int x, int y, String text, CallbackInfo ci) {
         if (!stack.isEmpty() && Config.isEnabled()) {
             DuraDisplayRenderer.INSTANCE.render((GuiGraphics)(Object)this, font, stack, x, y);
         }

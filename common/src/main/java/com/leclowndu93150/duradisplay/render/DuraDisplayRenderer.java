@@ -6,6 +6,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
@@ -47,7 +48,7 @@ public class DuraDisplayRenderer {
         poseStack.translate(0.0D, 0.0D, 500.0D);
         MultiBufferSource.BufferSource buffer = Minecraft.getInstance().renderBuffers().bufferSource();
         font.drawInBatch(
-                text,
+                Component.literal(text),
                 x,
                 y,
                 color,
