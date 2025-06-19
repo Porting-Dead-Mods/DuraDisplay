@@ -112,7 +112,6 @@ public class Main {
         @SubscribeEvent
         public static void onRegisterItemDecorations(final RegisterItemDecorationsEvent event) {
             for (Item item : BuiltInRegistries.ITEM) {
-                System.out.println("Registering the item decoration");
                 event.register(item, new DuraDisplay());
             }
         }
