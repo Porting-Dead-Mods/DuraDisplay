@@ -1,4 +1,5 @@
 package com.leclowndu93150.duradisplay.render;
+
 import com.leclowndu93150.duradisplay.compat.BuiltinCompat;
 import com.leclowndu93150.duradisplay.config.Config;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -8,6 +9,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
+import org.joml.Matrix3x2fStack;
 
 import java.util.List;
 
@@ -39,28 +41,13 @@ public class DuraDisplayRenderer {
     }
 
     private void renderText(GuiGraphics guiGraphics, Font font, String text, int xPosition, int yPosition, int color) {
-        PoseStack poseStack = guiGraphics.pose();
+        Matrix3x2fStack pose = guiGraphics.pose();
         int stringWidth = font.width(text);
-        int x = ((xPosition + 8) * 2 + 1 + stringWidth / 2 - stringWidth);
-        int y = (yPosition * 2) + 22;
-        poseStack.pushPose();
-        poseStack.scale(0.5F, 0.5F, 0.5F);
-        poseStack.translate(0.0D, 0.0D, 500.0D);
-        MultiBufferSource.BufferSource buffer = Minecraft.getInstance().renderBuffers().bufferSource();
-        font.drawInBatch(
-                Component.literal(text),
-                x,
-                y,
-                color,
-                true,
-                poseStack.last().pose(),
-                buffer,
-                Font.DisplayMode.NORMAL,
-                0,
-                15728880,
-                font.isBidirectional()
-        );
-        buffer.endBatch();
-        poseStack.popPose();
+        float x = ((xPosition + 8) * 2 + 1 + stringWidth / 2.0f - stringWidth);
+        float y = (yPosition * 2) + 22;
+        pose.pushMatrix();
+        pose.scale(0.5f, 0.5f);
+        guiGraphics.drawString(font, text, (int) x, (int) y, color | 0xFF000000, true);
+        pose.popMatrix();
     }
 }

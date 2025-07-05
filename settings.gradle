@@ -48,4 +48,3 @@ rootProject.name = 'DuraDisplayMultiloader'
 include('common')
 include('fabric')
 include('neoforge')
-include('forge')
