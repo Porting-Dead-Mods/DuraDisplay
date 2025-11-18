@@ -7,7 +7,8 @@ import com.leclowndu93150.duradisplay.platform.services.IPlatformHelper;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.energy.IEnergyStorage;
+import net.neoforged.neoforge.transfer.access.ItemAccess;
+import net.neoforged.neoforge.transfer.energy.EnergyHandler;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
@@ -26,10 +27,10 @@ public class NeoForgePlatformHelper implements IPlatformHelper {
         });
 
         DuraDisplayCommon.registerCompat(itemStack -> {
-            @Nullable IEnergyStorage energyStorage = itemStack.getCapability(Capabilities.EnergyStorage.ITEM);
-            if (energyStorage != null) {
+            EnergyHandler handler = ItemAccess.forStack(itemStack).getCapability(Capabilities.Energy.ITEM);
+            if (handler != null) {
                 return Collections.singletonList(new BuiltinCompat(
-                        ((double) energyStorage.getEnergyStored() / (double) energyStorage.getMaxEnergyStored()) * 100D,
+                        ((double) handler.getAmountAsInt() / (double) handler.getCapacityAsInt()) * 100D,
                         itemStack.getItem().getBarColor(itemStack),
                         itemStack.isBarVisible()
                 ));
@@ -52,10 +53,10 @@ public class NeoForgePlatformHelper implements IPlatformHelper {
             }
         }
 
-        @Nullable IEnergyStorage energyStorage = itemStack.getCapability(Capabilities.EnergyStorage.ITEM);
-        if (energyStorage != null) {
+        EnergyHandler handler = ItemAccess.forStack(itemStack).getCapability(Capabilities.Energy.ITEM);
+        if (handler != null) {
             return Collections.singletonList(new BuiltinCompat(
-                    ((double) energyStorage.getEnergyStored() / (double) energyStorage.getMaxEnergyStored()) * 100D,
+                    ((double) handler.getAmountAsInt() / (double) handler.getCapacityAsInt()) * 100D,
                     itemStack.getItem().getBarColor(itemStack),
                     itemStack.isBarVisible()
             ));

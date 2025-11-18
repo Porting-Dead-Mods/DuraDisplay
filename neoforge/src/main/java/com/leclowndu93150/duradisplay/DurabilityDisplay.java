@@ -4,6 +4,7 @@ package com.leclowndu93150.duradisplay;
 import com.leclowndu93150.duradisplay.config.Config;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
+import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModLoadingContext;
 import net.neoforged.fml.common.Mod;
@@ -30,7 +31,7 @@ public class DurabilityDisplay {
             "duradisplay.keybinds.toggle",
             InputConstants.Type.KEYSYM,
             GLFW.GLFW_KEY_M,
-            "duradisplay.keybinds.category"
+            KeyMapping.Category.register(ResourceLocation.parse("duradisplay:keybinds"))
     ));
 
     public void registerKeyMappings(RegisterKeyMappingsEvent event) {
