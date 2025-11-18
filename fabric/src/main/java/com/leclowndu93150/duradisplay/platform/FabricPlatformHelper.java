@@ -7,6 +7,7 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.KeyMapping;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import org.lwjgl.glfw.GLFW;
 
@@ -31,7 +32,7 @@ public class FabricPlatformHelper implements IPlatformHelper {
     private static final KeyMapping TOGGLE_KEY = KeyBindingHelper.registerKeyBinding(new KeyMapping(
             "duradisplay.keybinds.toggle",
             GLFW.GLFW_KEY_M,
-            "duradisplay.keybinds.category"
+            KeyMapping.Category.register(ResourceLocation.parse("duradisplay:keybinds"))
     ));
 
     @Override
