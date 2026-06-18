@@ -40,6 +40,7 @@ public final class DuraDisplayRenderer {
         float textX = ((x + 8) * 2 + 1 + width / 2.0f - width);
         float textY = (y * 2) + 22;
         pose.pushPose();
+        pose.translate(0.0F, 0.0F, 200.0F);
         pose.scale(0.5f, 0.5f, 1.0f);
         guiGraphics.drawString(font, text, (int) textX, (int) textY, color | 0xFF000000, true);
         pose.popPose();

@@ -10,6 +10,7 @@ import java.util.List;
 
 public final class DuraDisplay {
     public static final String MOD_ID = "duradisplay";
+    public static final String MC_VERSION = new String("1.20.1");
 
     private DuraDisplay() {
     }

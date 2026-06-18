@@ -3,7 +3,7 @@ plugins {
 }
 
 group = "com.leclowndu93150"
-version = "2.0.0"
+version = "2.1.1"
 
 prism {
     metadata {
@@ -42,9 +42,7 @@ prism {
             fabricApi("0.92.9+1.20.1")
 
             dependencies {
-                modImplementation("teamreborn:energy:3.0.0")
-                modRuntimeOnly("curse.maven:techreborn-233564:7529349")
-                modRuntimeOnly("curse.maven:reborncore-237903:7529347")
+                modCompileOnly("teamreborn:energy:3.0.0")
             }
 
             publishingDependencies {
@@ -76,9 +74,7 @@ prism {
             fabricApi("0.116.12+1.21.1")
 
             dependencies {
-                modImplementation("teamreborn:energy:4.2.0")
-                modRuntimeOnly("curse.maven:techreborn-233564:6664367")
-                modRuntimeOnly("curse.maven:reborncore-237903:6664366")
+                modCompileOnly("teamreborn:energy:4.2.0")
             }
 
             publishingDependencies {
@@ -110,7 +106,7 @@ prism {
             fabricApi("0.152.1+26.1.2")
 
             dependencies {
-                modImplementation("teamreborn:energy:5.0.0")
+                modCompileOnly("teamreborn:energy:5.0.0")
             }
 
             publishingDependencies {
@@ -128,7 +124,7 @@ prism {
             fabricApi("0.152.2+26.2")
 
             dependencies {
-                modImplementation("teamreborn:energy:5.0.0")
+                modCompileOnly("teamreborn:energy:5.0.0")
             }
 
             publishingDependencies {
